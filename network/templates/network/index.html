@@ -1,5 +1,22 @@
 {% extends "network/layout.html" %}
 
+{% load static %}
+
+{% block otherStatics %}
+    <script src="{% static 'network/index.js' %}"></script>
+{% endblock%}
+
 {% block body %}
-    TODO
+    <div class="indexContainer container-fluid">
+        <div class="newPostArea">
+            <label for="newPost">New Post</label>
+            <form action="">
+                <div class="form-group">
+                    <textarea id="newPost" class="form-control" cols="20" rows="4"></textarea>
+                </div>
+                <button id="submitNewPost" class="btn btn-primary" button>Post</button>
+            </form>
+        </div>
+
+    </div>
 {% endblock %}
