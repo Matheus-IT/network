@@ -26,11 +26,32 @@ class ViewsTestCase(TestCase):
 
 		response = self.client.post(reverse('login'), data)
 
-		# for user registered, the login should be successful, without warning message
+		# for registered users, the login should be successful, without warning message
 		try:
 			warning_message = response.context['message']
 			# no warning message == TypeError
 		except TypeError:
 			warning_message = False
 
-		self.assertEqual(warning_message, False)
+		self.assertFalse(warning_message)
+	
+	def test_fail_post_login_view(self):
+		data = {
+			'username': 'fail_user',
+			'password': '000000'
+		}
+
+		response = self.client.post(reverse('login'),  data)
+
+		try:
+			warning_message = response.context['message']
+		except TypeError:
+			warning_message = False
+		
+		self.assertTrue(warning_message)
+	
+	def test_logout_view(self):
+		response = self.client.get(reverse('logout'))
+
+		# I don't know why is 302, but...
+		self.assertEqual(response.status_code, 302)
