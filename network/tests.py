@@ -55,3 +55,7 @@ class ViewsTestCase(TestCase):
 
 		# I don't know why is 302, but...
 		self.assertEqual(response.status_code, 302)
+	
+	def test_get_register_view(self):
+		response = self.client.get(reverse('register'))
+		self.assertEqual(response.status_code, 200)
