@@ -1,13 +1,45 @@
 /* GLOBALS */
+* {
+	margin: 0;
+	padding: 0;
+}
+
 textarea {
 	resize: none;
 }
 
+/* NEW POST AREA*/
 .newPostArea {
-	width: 60%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	
+	width: 40%;
+	min-height: 55px;
 	margin: auto;
 	padding: 1em;
 	
 	border-radius: 0.4em;
 	border: 0.075em solid rgb(175, 175, 175);
+}
+
+.newPostArea label {
+	margin: 0;
+	min-width: 4.2em;
+	transition: all 250ms cubic-bezier(.68,-0.55,.27,1.55); 
+}
+
+.newPostArea .form-group {
+	margin: 0 0.6em;
+	width: 85%;
+}
+
+.newPostArea #newPost {
+	width: 100%;
+	height: 1.875em;
+
+	transition: height 250ms cubic-bezier(.68,-0.55,.27,1.55);
+}
+.newPostArea #newPost:focus {
+	height: 9.375em;
 }

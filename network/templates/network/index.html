@@ -4,19 +4,19 @@
 
 {% block otherStatics %}
     <script src="{% static 'network/index.js' %}"></script>
+    <script src="{% static 'network/indexForStyles.js' %}"></script>
 {% endblock%}
 
 {% block body %}
-    <div class="indexContainer container-fluid">
-        <div class="newPostArea">
-            <label for="newPost">New Post</label>
-            <form action="">
-                <div class="form-group">
-                    <textarea id="newPost" class="form-control" cols="20" rows="4"></textarea>
-                </div>
-                <button id="submitNewPost" class="btn btn-primary" button>Post</button>
-            </form>
+    <form action="" class="newPostArea">
+        <label id="newPostLabel" for="newPost">New Post</label>
+        <div class="form-group">
+            <textarea id="newPost" class="form-control" cols="20" rows="4"></textarea>
         </div>
+        <button id="submitNewPost" class="btn btn-primary" button>Post</button>
+    </form>
+
+    <div class="indexContainer container-fluid">
 
     </div>
 {% endblock %}
