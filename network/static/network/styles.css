@@ -13,30 +13,26 @@ textarea {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	
+
 	width: 40%;
 	min-height: 55px;
 	margin: auto;
 	padding: 1em;
-	
+
 	border-radius: 0.4em;
 	border: 0.075em solid rgb(175, 175, 175);
 }
 
 .newPostArea label {
 	margin: 0;
-	min-width: 4.2em;
-	transition: all 250ms cubic-bezier(.68,-0.55,.27,1.55); 
-}
-
-.newPostArea .form-group {
-	margin: 0 0.6em;
-	width: 85%;
+	min-width: 4.6em;
+	transition: all 250ms cubic-bezier(.68,-0.55,.27,1.55);
 }
 
 .newPostArea #newPost {
-	width: 100%;
-	height: 1.875em;
+	margin: 0 0.6em;
+	width: 85%;
+	height: 2.1875em;
 
 	transition: height 250ms cubic-bezier(.68,-0.55,.27,1.55);
 }
