@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	newPost.addEventListener('focusout', function() {
-		newPostLabel.style.display = 'block';
 		postButton.style.alignSelf = 'center';
+		newPostLabel.style.display = 'block';
 	});
 });
