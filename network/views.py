@@ -24,13 +24,15 @@ def index(request):
 
             print('New post created successfully!')
 
-        return render(request, "network/index.html", {
-            'newPostForm': NewPostForm()
-        })
+            allPosts = Post.objects.all()
+
     elif request.method == 'GET':
-        return render(request, "network/index.html", {
-            'newPostForm': NewPostForm()
-        })
+        allPosts = Post.objects.all()
+
+    return render(request, "network/index.html", {
+        'newPostForm': NewPostForm(),
+        'allPosts': allPosts
+    })
 
 
 def login_view(request):

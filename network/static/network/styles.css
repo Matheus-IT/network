@@ -39,3 +39,9 @@ textarea {
 .newPostArea #newPost:focus {
 	height: 9.375em;
 }
+
+/* POSTS CONTAINER */
+.postsContainer {
+	max-width: 40em;
+	margin: auto;
+}

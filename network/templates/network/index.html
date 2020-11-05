@@ -8,14 +8,20 @@
 
 {% block body %}
     <form action="{% url 'index' %}" method="POST" class="newPostArea">
-      {% csrf_token %}
+        {% csrf_token %}
 
-      {{ newPostForm }}
+        {{ newPostForm }}
 
-      <button id="submitNewPost" class="btn btn-primary" button>Post</button>
+        <button id="submitNewPost" class="btn btn-primary" button>Post</button>
     </form>
 
-    <div class="postsContainer container-fluid">
-
+    <div class="postsContainer">
+        {% for post in allPosts %}
+            <h1>{{ post.poster }}</h1>
+            <p>{{ post.content }}</p>
+            <em>{{ post.timestamp }}</em>
+            <br>
+            <strong>Likes {{ post.likes }}</strong>
+        {% endfor %}
     </div>
 {% endblock %}
