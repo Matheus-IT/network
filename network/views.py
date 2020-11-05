@@ -1,14 +1,36 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    from .forms import NewPostForm
+
+    if request.method == 'POST':
+        newPostForm = NewPostForm(request.POST)
+
+        if newPostForm.is_valid():
+            newPostContent = newPostForm.cleaned_data['newPostContent']
+
+            newPost = Post.objects.create(
+                poster=request.user,
+                content=newPostContent
+            )
+            newPost.save()
+
+            print('New post created successfully!')
+
+        return render(request, "network/index.html", {
+            'newPostForm': NewPostForm()
+        })
+    elif request.method == 'GET':
+        return render(request, "network/index.html", {
+            'newPostForm': NewPostForm()
+        })
 
 
 def login_view(request):
