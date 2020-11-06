@@ -17,6 +17,7 @@ textarea {
 	width: 40%;
 	min-height: 55px;
 	margin: auto;
+	margin-bottom: 1.6em;
 	padding: 1em;
 
 	border-radius: 0.4em;
@@ -44,4 +45,13 @@ textarea {
 .postsContainer {
 	max-width: 40em;
 	margin: auto;
+}
+
+.post {
+	margin: auto;
+	margin-bottom: 1em;
+	padding: 1em;
+
+	border-radius: 0.4em;
+	border: 0.075em solid rgb(175, 175, 175);
 }

@@ -16,12 +16,19 @@
     </form>
 
     <div class="postsContainer">
+        <h2>Latest posts:</h2>
+
         {% for post in allPosts %}
-            <h1>{{ post.poster }}</h1>
-            <p>{{ post.content }}</p>
-            <em>{{ post.timestamp }}</em>
-            <br>
-            <strong>Likes {{ post.likes }}</strong>
+            <div class="post">
+                <h3>
+                    <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
+                </h3>
+                <p>{{ post.content }}</p>
+                <em>{{ post.timestamp }}</em>
+                <br>
+                <strong>Likes {{ post.likes }}</strong>
+                <br>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}
