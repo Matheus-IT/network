@@ -1,0 +1,11 @@
+{% extends './layout.html' %}
+
+{% block title %}
+  Profile Page
+{% endblock %}
+
+{% block body %}
+  <h3>Username {{ username }}</h3>
+  <h3>This user has {{ n_of_followers }} followers</h3>
+  <h3>This user is following {{ n_following }} users</h3>
+{% endblock %}

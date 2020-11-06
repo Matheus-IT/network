@@ -8,6 +8,20 @@ class User(AbstractUser):
     pass
 
 
+class Follower(models.Model):
+    user_being_followed = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='followers'
+    )
+
+    user_follower = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='users_being_followed'
+    )
+
+
 class Post(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     content = models.TextField()

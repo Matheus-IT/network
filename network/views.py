@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Post
+from .models import User, Post, Follower
 
 
 def index(request):
@@ -24,15 +24,30 @@ def index(request):
 
             print('New post created successfully!')
 
-            allPosts = Post.objects.all()
+            # get all posts from the newest to the oldest
+            allPosts = Post.objects.order_by('-timestamp').all()
 
     elif request.method == 'GET':
-        allPosts = Post.objects.all()
+        allPosts = Post.objects.order_by('-timestamp').all()
 
     return render(request, "network/index.html", {
         'newPostForm': NewPostForm(),
         'allPosts': allPosts
     })
+
+
+def profilePage(request, profileId):
+    profile = User.objects.get(id=profileId)
+
+    followers = Follower.objects.filter(user_being_followed=profileId).all()
+    following = Follower.objects.filter(user_follower=profileId).all()
+
+    context = {
+        'username': profile.username,
+        'n_of_followers': len(followers),
+        'n_following': len(following)
+    }
+    return render(request, 'network/profilePage.html', context)
 
 
 def login_view(request):
