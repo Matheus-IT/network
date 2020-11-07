@@ -10,7 +10,7 @@ from .models import User, Post, Follower
 def index(request):
     from .forms import NewPostForm
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
         newPostForm = NewPostForm(request.POST)
 
         if newPostForm.is_valid():
@@ -24,11 +24,7 @@ def index(request):
 
             print('New post created successfully!')
 
-            # get all posts from the newest to the oldest
-            allPosts = Post.objects.order_by('-timestamp').all()
-
-    elif request.method == 'GET':
-        allPosts = Post.objects.order_by('-timestamp').all()
+    allPosts = Post.objects.order_by('-timestamp').all()
 
     return render(request, "network/index.html", {
         'newPostForm': NewPostForm(),
