@@ -44,13 +44,25 @@ class ViewsTestCase(TestCase):
 
 		request = self.factory.post(reverse('index'))
 
-		# this should fail because this user is not registered in the database
+		# this response should fail because this user is not registered in the database
 		request.user = AnonymousUser()
 		request.data = {'newPostContent': 'blabalbalababal'}
 
 		response = index(request)
 
 		self.assertEqual(response.status_code, 403)
+
+	# TESTS FOR PROFILE PAGE
+	def test_get_profile_page(self):
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 1}))
+
+		self.assertEqual(response.status_code, 200)
+
+	def test_fail_get_profile_page(self):
+		# This response should fail because this profile id doesn't exist
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 0}))
+
+		self.assertEqual(response.status_code, 404)
 
 	# TESTS FOR LOGIN VIEW
 	def test_get_login_view(self):

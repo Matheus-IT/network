@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -36,7 +37,10 @@ def index(request):
 
 
 def profilePage(request, profileId):
-    profile = User.objects.get(id=profileId)
+    try:
+        profile = User.objects.get(id=profileId)
+    except ObjectDoesNotExist:
+        return HttpResponse(status=404)
 
     followers = Follower.objects.filter(user_being_followed=profileId).all()
     following = Follower.objects.filter(user_follower=profileId).all()
