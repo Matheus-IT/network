@@ -10,19 +10,22 @@ from .models import User, Post, Follower
 def index(request):
     from .forms import NewPostForm
 
-    if request.method == 'POST' and request.user.is_authenticated:
-        newPostForm = NewPostForm(request.POST)
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            newPostForm = NewPostForm(request.POST)
 
-        if newPostForm.is_valid():
-            newPostContent = newPostForm.cleaned_data['newPostContent']
+            if newPostForm.is_valid():
+                newPostContent = newPostForm.cleaned_data['newPostContent']
 
-            newPost = Post.objects.create(
-                poster=request.user,
-                content=newPostContent
-            )
-            newPost.save()
+                newPost = Post.objects.create(
+                    poster=request.user,
+                    content=newPostContent
+                )
+                newPost.save()
 
-            print('New post created successfully!')
+                print('New post created successfully!')
+        else:
+            return HttpResponse(status=403)
 
     allPosts = Post.objects.order_by('-timestamp').all()
 

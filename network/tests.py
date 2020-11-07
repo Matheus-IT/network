@@ -1,5 +1,6 @@
 from django.test import Client, TestCase, RequestFactory
 from django.urls import reverse
+from django.contrib.auth.models import AnonymousUser
 
 from .models import User
 
@@ -37,6 +38,19 @@ class ViewsTestCase(TestCase):
 		response = index(request)
 
 		self.assertEqual(response.status_code, 200)
+
+	def test_fail_post_index(self):
+		from .views import index
+
+		request = self.factory.post(reverse('index'))
+
+		# this should fail because this user is not registered in the database
+		request.user = AnonymousUser()
+		request.data = {'newPostContent': 'blabalbalababal'}
+
+		response = index(request)
+
+		self.assertEqual(response.status_code, 403)
 
 	# TESTS FOR LOGIN VIEW
 	def test_get_login_view(self):
