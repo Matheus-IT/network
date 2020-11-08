@@ -42,13 +42,15 @@ def profilePage(request, profileId):
     except ObjectDoesNotExist:
         return HttpResponse(status=404)
 
+    userPosts = Post.objects.order_by('-timestamp').filter(poster=profile)
     followers = Follower.objects.filter(user_being_followed=profileId).all()
     following = Follower.objects.filter(user_follower=profileId).all()
 
     context = {
         'username': profile.username,
         'n_of_followers': len(followers),
-        'n_following': len(following)
+        'n_following': len(following),
+        'user_posts': userPosts
     }
     return render(request, 'network/profilePage.html', context)
 
