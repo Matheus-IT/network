@@ -36,6 +36,18 @@ html {
   height: 9.375em;
 }
 
+.profileContainer {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 40em;
+  margin: 1.6em auto;
+}
+.profileContainer .btn {
+  min-width: 15.625em;
+  align-self: flex-end;
+}
+
 .postsContainer {
   max-width: 40em;
   margin: auto;

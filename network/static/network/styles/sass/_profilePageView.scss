@@ -1,0 +1,13 @@
+.profileContainer {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+
+	width: 40em;
+	margin: 1.6em auto;
+
+	.btn {
+		min-width: 15.625em;
+		align-self: flex-end;
+	}
+}
