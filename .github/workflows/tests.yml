@@ -1,7 +1,7 @@
 name: Testing
 on: push
 jobs:
-  Tests-app-network-on-each-push:
+  Tests_app_network_on_each_push:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v2
