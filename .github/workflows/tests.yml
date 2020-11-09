@@ -1,5 +1,5 @@
 name: Testing
-on: [push]
+on: push
 jobs:
   Tests-app-network-on-each-push:
   runs-on: ubuntu-latest
