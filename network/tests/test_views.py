@@ -108,3 +108,8 @@ class Login(TestCase):
 
 		warning_message = self.hasWarning(response)
 		self.assertTrue(warning_message)
+	
+class Logout(TestCase):
+	def test_get(self):
+		response = self.client.get(reverse('logout'), follow=True)
+		self.assertEqual(response.status_code, 200)
