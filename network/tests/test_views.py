@@ -4,7 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 
 from ..models import User
 
-# I need to rearrange my tests and make them more independent
+
 class Index(TestCase):
 	def setUp(self):
 		self.client = Client()
@@ -42,4 +42,23 @@ class Index(TestCase):
 		response = index(request)
 
 		self.assertEqual(response.status_code, 403)
-		
+
+
+class ProfilePage(TestCase):
+	def setUp(self):
+		self.client = Client()
+		self.mock_user = User.objects.create_user(
+			username='test_user', password='12345', email='test_user@example.com'
+		)
+	
+	def test_get(self):
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 1}))
+
+		self.assertEqual(response.status_code, 200)
+	
+	def test_fail_get(self):
+		""" This test should fail because this profile id doesn't exist in the database """
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 0}))
+
+		self.assertEqual(response.status_code, 404)
+	
