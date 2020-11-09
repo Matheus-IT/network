@@ -109,7 +109,57 @@ class Login(TestCase):
 		warning_message = self.hasWarning(response)
 		self.assertTrue(warning_message)
 	
+
 class Logout(TestCase):
 	def test_get(self):
 		response = self.client.get(reverse('logout'), follow=True)
 		self.assertEqual(response.status_code, 200)
+
+
+class Register(TestCase):
+	def setUp(self):
+		self.mock_user = User.objects.create_user(
+			username='test_user', password='12345', email='test_user@example.com'
+		)
+	
+	def hasWarning(self, response):
+		""" for new users, the registration should be successful, without warning message.
+			if there is a warning message something went wrong """
+		try:
+			warning_message = response.context['message']
+			# no warning message == TypeError
+		except TypeError:
+			warning_message = False
+		return warning_message
+	
+	def test_get(self):
+		response = self.client.get(reverse('register'))
+	
+		self.assertEqual(response.status_code, 200)
+	
+	def test_post(self):
+		data = {
+			'username': 'new_test_user',
+			'email': 'test@example.com',
+			'password': '12345',
+			'confirmation': '12345'
+		}
+
+		response = self.client.post(reverse('register'), data, follow=True)
+		self.assertEqual(response.status_code, 200)
+
+	def test_fail_post(self):
+		""" This test should fail because this user already exists in the database """
+		
+		data = {
+			'username': self.mock_user.username,
+			'email': self.mock_user.email,
+			'password': self.mock_user.password,
+			'confirmation': self.mock_user.password
+		}
+
+		response = self.client.post(reverse('register'), data, follow=True)
+
+		warning_message = self.hasWarning(response)
+
+		self.assertTrue(warning_message)
