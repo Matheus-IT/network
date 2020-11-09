@@ -1,14 +1,7 @@
-/* GLOBALS */
-* {
-	margin: 0;
-	padding: 0;
-}
-
 textarea {
 	resize: none;
 }
 
-/* NEW POST AREA*/
 .newPostArea {
 	display: flex;
 	justify-content: space-between;
@@ -39,19 +32,4 @@ textarea {
 }
 .newPostArea #newPost:focus {
 	height: 9.375em;
-}
-
-/* POSTS CONTAINER */
-.postsContainer {
-	max-width: 40em;
-	margin: auto;
-}
-
-.post {
-	margin: auto;
-	margin-bottom: 1em;
-	padding: 1em;
-
-	border-radius: 0.4em;
-	border: 0.075em solid rgb(175, 175, 175);
 }
