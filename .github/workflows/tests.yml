@@ -1,0 +1,10 @@
+name: Testing
+on: [push]
+jobs:
+  Tests-app-network-on-each-push:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+    - run: |
+      pip3 install --user django
+      python3 manage.py test
