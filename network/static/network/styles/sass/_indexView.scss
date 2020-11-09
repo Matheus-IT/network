@@ -1,7 +1,3 @@
-textarea {
-	resize: none;
-}
-
 .newPostArea {
 	display: flex;
 	justify-content: space-between;
@@ -14,22 +10,24 @@ textarea {
 	padding: 1em;
 
 	border-radius: 0.4em;
-	border: 0.075em solid rgb(175, 175, 175);
-}
+	border: 0.075em solid $gray;
 
-.newPostArea label {
-	margin: 0;
-	min-width: 4.6em;
-	transition: all 250ms cubic-bezier(.68,-0.55,.27,1.55);
-}
+	label {
+		margin: 0;
+		min-width: 4.6em;
+		transition: all 250ms $flutteredAnimation;
+	}
 
-.newPostArea #newPost {
-	margin: 0 0.6em;
-	width: 85%;
-	height: 2.1875em;
+	#newPost {
+		margin: 0 0.6em;
+		width: 85%;
+		height: 2.1875em;
+		resize: none;
 
-	transition: height 250ms cubic-bezier(.68,-0.55,.27,1.55);
-}
-.newPostArea #newPost:focus {
-	height: 9.375em;
+		transition: height 250ms $flutteredAnimation;
+	
+		&:focus {
+			height: 9.375em;
+		}
+	}
 }
