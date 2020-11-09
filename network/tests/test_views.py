@@ -61,4 +61,50 @@ class ProfilePage(TestCase):
 		response = self.client.get(reverse('profilePage', kwargs={'profileId': 0}))
 
 		self.assertEqual(response.status_code, 404)
+
+
+class Login(TestCase):
+	def setUp(self):
+		self.mock_user = User.objects.create_user(
+			username='test_user', password='12345', email='test_user@example.com'
+		)
 	
+	def hasWarning(self, response):
+		""" for registered users, the login should be successful, without warning message.
+			if there is a warning message something wrong happaned """
+		try:
+			warning_message = response.context['message']
+			# no warning message == TypeError
+		except TypeError:
+			warning_message = False
+		return warning_message
+	
+	def test_get(self):
+		response = self.client.get(reverse('login'))
+
+		self.assertEqual(response.status_code, 200)
+	
+	def test_post(self):
+		data = {
+			'username': 'test_user',
+			'password': '12345'
+		}
+
+		response = self.client.post(reverse('login'), data)
+
+		warning_message = self.hasWarning(response)
+		self.assertFalse(warning_message)
+	
+	def test_fail_post(self):
+		""" If the user try to login without being registered, this user should
+			receive a warning message """
+		
+		data = {
+			'username': 'fail_user',
+			'password': '000000'
+		}
+
+		response = self.client.post(reverse('login'),  data)
+
+		warning_message = self.hasWarning(response)
+		self.assertTrue(warning_message)
