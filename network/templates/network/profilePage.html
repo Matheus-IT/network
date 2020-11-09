@@ -23,6 +23,8 @@
             <strong>Likes {{ post.likes }}</strong>
             <br>
         </div>
+      {% empty %}
+        <h2>There are no posts here yet...</h2>
     {% endfor %}
 </div>
 {% endblock %}
