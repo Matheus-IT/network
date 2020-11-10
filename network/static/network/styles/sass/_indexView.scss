@@ -1,0 +1,33 @@
+.newPostArea {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	width: 40%;
+	min-height: 55px;
+	margin: auto;
+	margin-bottom: 1.6em;
+	padding: 1em;
+
+	border-radius: 0.4em;
+	border: 0.075em solid $gray;
+
+	label {
+		margin: 0;
+		min-width: 4.6em;
+		transition: all 250ms $flutteredAnimation;
+	}
+
+	#newPost {
+		margin: 0 0.6em;
+		width: 85%;
+		height: 2.1875em;
+		resize: none;
+
+		transition: height 250ms $flutteredAnimation;
+	
+		&:focus {
+			height: 9.375em;
+		}
+	}
+}

@@ -1,28 +1,52 @@
 {% extends './layout.html' %}
 
+{% load static %}
+
 {% block title %}
-  Profile Page
+	Profile Page
 {% endblock %}
 
 {% block body %}
-  <h3>Username {{ username }}</h3>
-  <h3>This user has {{ n_of_followers }} followers</h3>
-  <h3>This user is following {{ n_following }} users</h3>
+	<div class="container-sm profileContainer">
+		<div>
+			<img src="{% static 'network/images/profileImage.png' %}" alt="Profile image">
+			<h3>
+				<strong>{{ username }}</strong>
+			</h3>
+			
+			<h4 class="followNumbers">
+				<strong>{{ n_following }}</strong> following
+				<strong>{{ n_of_followers }}</strong> followers
+			</h4>
+		</div>
+		
+		{% if user.is_authenticated and user.username != username %}
+			<button type="button" id="followBtn" class="btn btn-primary">
+				{% if visitor_is_following %}
+					Unfollow
+				{% else %}
+					Follow
+				{% endif %}
+			</button>
+		{% endif %}
+	</div>
 
-  <div class="postsContainer">
-    <h2>Latest posts:</h2>
+	<div class="postsContainer">
+		<h2>Latest posts:</h2>
 
-    {% for post in user_posts %}
-        <div class="post">
-            <h3>
-                <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
-            </h3>
-            <p>{{ post.content }}</p>
-            <em>{{ post.timestamp }}</em>
-            <br>
-            <strong>Likes {{ post.likes }}</strong>
-            <br>
-        </div>
-    {% endfor %}
-</div>
+		{% for post in profile_posts %}
+			<div class="post">
+				<h3>
+						<a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
+				</h3>
+				<p>{{ post.content }}</p>
+				<em>{{ post.timestamp }}</em>
+				<br>
+				<strong>Likes {{ post.likes }}</strong>
+				<br>
+			</div>
+		{% empty %}
+			<h2>There are no posts here yet...</h2>
+		{% endfor %}
+	</div>
 {% endblock %}

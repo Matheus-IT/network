@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+  box-sizing: border-box;
+}
+
+.newPostArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 40%;
+  min-height: 55px;
+  margin: auto;
+  margin-bottom: 1.6em;
+  padding: 1em;
+  border-radius: 0.4em;
+  border: 0.075em solid #afafaf;
+}
+.newPostArea label {
+  margin: 0;
+  min-width: 4.6em;
+  transition: all 250ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.newPostArea #newPost {
+  margin: 0 0.6em;
+  width: 85%;
+  height: 2.1875em;
+  resize: none;
+  transition: height 250ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.newPostArea #newPost:focus {
+  height: 9.375em;
+}
+
+.profileContainer {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 40em;
+  margin: 1.6em auto;
+}
+.profileContainer .btn {
+  min-width: 15.625em;
+  align-self: flex-end;
+}
+
+.postsContainer {
+  max-width: 40em;
+  margin: auto;
+}
+.postsContainer .post {
+  margin: auto;
+  margin-bottom: 1em;
+  padding: 1em;
+  border-radius: 0.4em;
+  border: 0.075em solid #afafaf;
+}
+
+/*# sourceMappingURL=styles.css.map */
