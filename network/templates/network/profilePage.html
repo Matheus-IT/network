@@ -34,7 +34,7 @@
 	<div class="postsContainer">
 		<h2>Latest posts:</h2>
 
-		{% for post in user_posts %}
+		{% for post in profile_posts %}
 			<div class="post">
 				<h3>
 						<a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says

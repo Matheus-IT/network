@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views import View
 
 from .models import User, Post, Follower
 
@@ -36,41 +37,44 @@ def index(request):
     })
 
 
-def checkVisitorIsFollowingThisProfile(visitor, profile):
-    visitor_following_list = Follower.objects.filter(user_follower=visitor)
+class ProfilePage(View):
+    template_name = 'network/profilePage.html'
 
-    for followed_by_visitor in visitor_following_list:
-        if profile.id == followed_by_visitor.id:
-            return True
+    def _checkVisitorIsFollowingThisProfile(self, request, profile):
+        try:
+            visitor = User.objects.get(id=request.user.id)
+            visitor_following_list = list(Follower.objects.filter(user_follower=visitor))
+            visitor_following_list_ids = map(
+                lambda followed_by_visitor: followed_by_visitor.id, visitor_following_list
+            )
 
-    return False
+            if profile.id in visitor_following_list_ids:
+                return True
+            return False
+        except ObjectDoesNotExist:
+            return False
 
+    def get(self, request, profileId):        
+        try:
+            profile = User.objects.get(id=profileId)
+        except ObjectDoesNotExist:
+            return HttpResponse(status=404)
 
-def profilePage(request, profileId):
-    try:
-        profile = User.objects.get(id=profileId)
-    except ObjectDoesNotExist:
-        return HttpResponse(status=404)
+        profile_posts = Post.objects.order_by('-timestamp').filter(poster=profile)
+        profile_followers = Follower.objects.filter(user_being_followed=profileId).all()
+        profile_following = Follower.objects.filter(user_follower=profileId).all()
 
-    userPosts = Post.objects.order_by('-timestamp').filter(poster=profile)
-    followers = Follower.objects.filter(user_being_followed=profileId).all()
-    following = Follower.objects.filter(user_follower=profileId).all()
+        visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile)
 
-    if request.user.is_authenticated:
-        visitor = User.objects.get(id=request.user.id)
-        visitor_is_following = checkVisitorIsFollowingThisProfile(visitor, profile)
-    else:
-        visitor_is_following = False
+        context = {
+            'username': profile.username,
+            'n_of_followers': len(profile_followers),
+            'n_following': len(profile_following),
+            'profile_posts': profile_posts,
+            'visitor_is_following': visitor_is_following
+        }
 
-    context = {
-        'username': profile.username,
-        'n_of_followers': len(followers),
-        'n_following': len(following),
-        'user_posts': userPosts,
-        'visitor_is_following': visitor_is_following
-    }
-
-    return render(request, 'network/profilePage.html', context)
+        return render(request, self.template_name, context)
 
 
 def login_view(request):
