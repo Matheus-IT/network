@@ -36,6 +36,16 @@ def index(request):
     })
 
 
+def checkVisitorIsFollowingThisProfile(visitor, profile):
+    visitor_following_list = Follower.objects.filter(user_follower=visitor)
+
+    for followed_by_visitor in visitor_following_list:
+        if profile.id == followed_by_visitor.id:
+            return True
+
+    return False
+
+
 def profilePage(request, profileId):
     try:
         profile = User.objects.get(id=profileId)
@@ -46,12 +56,20 @@ def profilePage(request, profileId):
     followers = Follower.objects.filter(user_being_followed=profileId).all()
     following = Follower.objects.filter(user_follower=profileId).all()
 
+    if request.user.is_authenticated:
+        visitor = User.objects.get(id=request.user.id)
+        visitor_is_following = checkVisitorIsFollowingThisProfile(visitor, profile)
+    else:
+        visitor_is_following = False
+
     context = {
         'username': profile.username,
         'n_of_followers': len(followers),
         'n_following': len(following),
-        'user_posts': userPosts
+        'user_posts': userPosts,
+        'visitor_is_following': visitor_is_following
     }
+
     return render(request, 'network/profilePage.html', context)
 
 

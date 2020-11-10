@@ -20,7 +20,15 @@
 			</h4>
 		</div>
 		
-		<button type="button" id="followBtn" class="btn btn-primary">Follow</button>
+		{% if user.is_authenticated and user.username != username %}
+			<button type="button" id="followBtn" class="btn btn-primary">
+				{% if visitor_is_following %}
+					Unfollow
+				{% else %}
+					Follow
+				{% endif %}
+			</button>
+		{% endif %}
 	</div>
 
 	<div class="postsContainer">
