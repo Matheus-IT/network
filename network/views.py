@@ -40,31 +40,32 @@ def index(request):
 class ProfilePage(View):
     template_name = 'network/profilePage.html'
 
-    def _checkVisitorIsFollowingThisProfile(self, request, profile):
-        try:
-            visitor = User.objects.get(id=request.user.id)
-            visitor_following_list = list(Follower.objects.filter(user_follower=visitor))
-            visitor_following_list_ids = map(
-                lambda followed_by_visitor: followed_by_visitor.id, visitor_following_list
-            )
+    def _checkVisitorIsFollowingThisProfile(self, request, profile_followers):
+        """ In case of a visitor authenticated, this should tell if the visitor
+            of this page is following this profile """
+        from django.contrib.auth.models import AnonymousUser
 
-            if profile.id in visitor_following_list_ids:
-                return True
-            return False
-        except ObjectDoesNotExist:
+        if isinstance(request.user, AnonymousUser):
             return False
 
-    def get(self, request, profileId):        
+        visitor = User.objects.get(id=request.user.id)
+
+        if visitor.id in map(lambda profile_follower: profile_follower.id, profile_followers):
+            return True
+        return False
+
+    def get(self, request, profileId):
         try:
             profile = User.objects.get(id=profileId)
         except ObjectDoesNotExist:
             return HttpResponse(status=404)
 
         profile_posts = Post.objects.order_by('-timestamp').filter(poster=profile)
-        profile_followers = Follower.objects.filter(user_being_followed=profileId).all()
-        profile_following = Follower.objects.filter(user_follower=profileId).all()
+        # get a list of profile followers from each Follower that is related to this profile
+        profile_followers = [profile_follower.user_follower for profile_follower in profile.followers.all()]
+        profile_following = profile.users_being_followed.all()
 
-        visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile)
+        visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile_followers)
 
         context = {
             'username': profile.username,
