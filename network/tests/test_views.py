@@ -66,9 +66,7 @@ class ProfilePage(TestCase):
 			email=user['email']
 		)
 
-	def test_get(self):
-		from ..views import ProfilePage
-
+	def test_get_when_visitor_is_following(self):
 		# user_follower and user_being_followed receive instances of User
 		Follower.objects.create(
 			user_follower=self.createUser(self.mock_user1),
@@ -83,6 +81,22 @@ class ProfilePage(TestCase):
 		)
 
 		response = self.client.get(reverse('profilePage', kwargs={'profileId': 2}))
+
+		self.assertEqual(visitor_is_following_this_profile, response.context['visitor_is_following'])
+		self.assertEqual(response.status_code, 200)
+	
+	def test_get_when_visitor_is_not_following(self):
+		self.createUser(self.mock_user1)
+		self.createUser(self.mock_user2)
+
+		# mock_user2 is visiting mock_user1, but mock_user2 is not following mock_user1
+		visitor_is_following_this_profile = False
+		result = self.client.login(
+			username=self.mock_user2['username'],
+			password=self.mock_user2['password']
+		)
+
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 1}))
 
 		self.assertEqual(visitor_is_following_this_profile, response.context['visitor_is_following'])
 		self.assertEqual(response.status_code, 200)
