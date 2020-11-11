@@ -2,7 +2,7 @@ from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import AnonymousUser
 
-from ..models import User
+from ..models import User, Follower
 
 
 class Index(TestCase):
@@ -47,17 +47,62 @@ class Index(TestCase):
 class ProfilePage(TestCase):
 	def setUp(self):
 		self.client = Client()
-		self.mock_user = User.objects.create_user(
-			username='test_user', password='12345', email='test_user@example.com'
-		)
-	
-	def test_get(self):
-		response = self.client.get(reverse('profilePage', kwargs={'profileId': 1}))
 
+		self.mock_user1 = {
+			'username': 'test_user1',
+			'password': '12345',
+			'email': 'test_user1@example.com'
+		}
+		self.mock_user2 = {
+			'username': 'test_user2',
+			'password': '12345',
+			'email': 'test_user2@example.com'
+		}
+	
+	def createUser(self, user):
+		return User.objects.create_user(
+			username=user['username'],
+			password=user['password'],
+			email=user['email']
+		)
+
+	def test_get_when_visitor_is_following(self):
+		# user_follower and user_being_followed receive instances of User
+		Follower.objects.create(
+			user_follower=self.createUser(self.mock_user1),
+			user_being_followed=self.createUser(self.mock_user2)
+		)
+		visitor_is_following_this_profile = True
+
+		# mock_user1 is visiting mock_user2
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 2}))
+
+		self.assertEqual(visitor_is_following_this_profile, response.context['visitor_is_following'])
 		self.assertEqual(response.status_code, 200)
 	
+	def test_get_when_visitor_is_not_following(self):
+		self.createUser(self.mock_user1)
+		self.createUser(self.mock_user2)
+
+		# mock_user2 is visiting mock_user1, but mock_user2 is not following mock_user1
+		visitor_is_following_this_profile = False
+		result = self.client.login(
+			username=self.mock_user2['username'],
+			password=self.mock_user2['password']
+		)
+
+		response = self.client.get(reverse('profilePage', kwargs={'profileId': 1}))
+
+		self.assertEqual(visitor_is_following_this_profile, response.context['visitor_is_following'])
+		self.assertEqual(response.status_code, 200)
+
 	def test_fail_get(self):
-		""" This test should fail because this profile id doesn't exist in the database """
+		""" This case should fail because this profile id doesn't exist in the database """
 		response = self.client.get(reverse('profilePage', kwargs={'profileId': 0}))
 
 		self.assertEqual(response.status_code, 404)
@@ -149,7 +194,7 @@ class Register(TestCase):
 		self.assertEqual(response.status_code, 200)
 
 	def test_fail_post(self):
-		""" This test should fail because this user already exists in the database """
+		""" This case should fail because this user already exists in the database """
 		
 		data = {
 			'username': self.mock_user.username,
