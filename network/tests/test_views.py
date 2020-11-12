@@ -154,6 +154,30 @@ class ProfilePage(TestCase):
 
 		self.assertEqual(response.status_code, 204)
 
+	def test_fail_put_when_request_for_visitor_to_follow_the_current_profile(self):
+		""" This test case should fail because the visitor IS following the current profile, then he
+			makes a PUT request	for profilePage to make it FOLLOW this profile """
+		mock_User1 = self.createUser(self.mock_user1)
+		mock_User2 = self.createUser(self.mock_user2)
+
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		Follower.objects.create(
+			user_follower = mock_User1,
+			user_being_followed = mock_User2
+		)
+		visitor_is_following = True
+
+		data = json.dumps({
+			'visitor_is_following': visitor_is_following
+		})
+		response = self.client.put(reverse('profilePage', kwargs={'profileId': mock_User2.id}), data)
+
+		self.assertEqual(response.status_code, 400)
+
 	def test_fail_put(self):
 		""" This case should fail because it tries to put to a profile id that doesn't exist """
 		response = self.client.put('profilePage', kwargs={'profileId': 0})

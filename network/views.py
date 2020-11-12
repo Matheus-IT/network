@@ -103,8 +103,7 @@ class ProfilePage(View):
                 follower.save()
                 return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=204)
             else:
-                print('This visitor is already following this profile!')
-                return JsonResponse({'msg': 'This visitor is already following this profile!'}, status=404)
+                return JsonResponse({'msg': 'This visitor is already following this profile!'}, status=400)
         else:
             # delete Follower
             try:
