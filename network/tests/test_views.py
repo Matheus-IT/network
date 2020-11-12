@@ -32,7 +32,7 @@ class Index(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 
-	def test_fail_post(self):
+	def test_bad_post(self):
 		""" this response should fail because this user is not registered in the database """
 		from ..views import index
 
@@ -103,7 +103,7 @@ class ProfilePage(TestCase):
 		self.assertEqual(visitor_is_following_this_profile, response.context['visitor_is_following'])
 		self.assertEqual(response.status_code, 200)
 
-	def test_fail_get(self):
+	def test_bad_get(self):
 		""" This case should fail because this profile id doesn't exist in the database """
 		response = self.client.get(reverse('profilePage', kwargs={'profileId': 0}))
 
@@ -154,7 +154,7 @@ class ProfilePage(TestCase):
 
 		self.assertEqual(response.status_code, 204)
 
-	def test_fail_put_when_request_for_visitor_to_follow_the_current_profile(self):
+	def test_bad_put_when_request_for_visitor_to_follow_the_current_profile(self):
 		""" This test case should fail because the visitor IS following the current profile, then he
 			makes a PUT request	for profilePage to make it FOLLOW this profile """
 		mock_User1 = self.createUser(self.mock_user1)
@@ -178,7 +178,7 @@ class ProfilePage(TestCase):
 
 		self.assertEqual(response.status_code, 400)
 
-	def test_fail_put(self):
+	def test_bad_put(self):
 		""" This case should fail because it tries to put to a profile id that doesn't exist """
 		response = self.client.put('profilePage', kwargs={'profileId': 0})
 
@@ -206,7 +206,7 @@ class Login(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 
-	def test_post(self):
+	def test_post_login(self):
 		data = {
 			'username': 'test_user',
 			'password': '12345'
@@ -217,7 +217,7 @@ class Login(TestCase):
 		warning_message = self.hasWarning(response)
 		self.assertFalse(warning_message)
 
-	def test_fail_post(self):
+	def test_bad_post_login(self):
 		""" If the user try to login without being registered, this user should
 			receive a warning message """
 
@@ -259,7 +259,7 @@ class Register(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 
-	def test_post(self):
+	def test_post_register(self):
 		data = {
 			'username': 'new_test_user',
 			'email': 'test@example.com',
@@ -270,7 +270,7 @@ class Register(TestCase):
 		response = self.client.post(reverse('register'), data, follow=True)
 		self.assertEqual(response.status_code, 200)
 
-	def test_fail_post(self):
+	def test_bad_post_register(self):
 		""" This case should fail because this user already exists in the database """
 
 		data = {
