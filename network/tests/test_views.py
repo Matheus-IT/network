@@ -154,6 +154,26 @@ class ProfilePage(TestCase):
 
 		self.assertEqual(response.status_code, 204)
 
+	def test_bad_put_when_request_for_visitor_to_unfollow_the_current_profile(self):
+		""" The visitor IS NOT following the current profile, then he makes a PUT request
+		 	for profilePage to make it UNFOLLOW this profile """
+		mock_User1 = self.createUser(self.mock_user1)
+		mock_User2 = self.createUser(self.mock_user2)
+
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		visitor_is_following = False
+
+		data = json.dumps({
+			'visitor_is_following': visitor_is_following
+		})
+		response = self.client.put(reverse('profilePage', kwargs={'profileId': mock_User2.id}), data)
+
+		self.assertEqual(response.status_code, 400)
+
 	def test_bad_put_when_request_for_visitor_to_follow_the_current_profile(self):
 		""" This test case should fail because the visitor IS following the current profile, then he
 			makes a PUT request	for profilePage to make it FOLLOW this profile """

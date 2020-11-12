@@ -114,8 +114,7 @@ class ProfilePage(View):
                 follower.delete()
                 return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=204)
             except ObjectDoesNotExist:
-                print('Error: the object does not exist')
-                return JsonResponse({'msg': 'Error: the object does not exist'}, status=404)
+                return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
 
 
 
