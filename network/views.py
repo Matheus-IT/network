@@ -77,6 +77,50 @@ class ProfilePage(View):
 
         return render(request, self.template_name, context)
 
+    def put(self, request, profileId):
+        import json
+
+        try:
+            profile = User.objects.get(id=profileId)
+        except ObjectDoesNotExist:
+            return HttpResponse(status=404)
+
+        data = json.loads(request.body)
+        visitor = request.user
+
+        if data['visitor_is_following']:
+            try:
+                follower = Follower.objects.get(
+                    user_follower = visitor,
+                    user_being_followed = profile
+                )
+            except ObjectDoesNotExist:
+                # create Follower, making the visitor follow this profile
+                follower = Follower.objects.create(
+                    user_follower = visitor,
+                    user_being_followed = profile
+                )
+                follower.save()
+                return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=204)
+            else:
+                print('This visitor is already following this profile!')
+                return JsonResponse({'msg': 'This visitor is already following this profile!'}, status=404)
+        else:
+            # delete Follower
+            try:
+                follower = Follower.objects.get(
+                    user_follower = visitor,
+                    user_being_followed = profile
+                )
+                follower.delete()
+                print('Success! Now the visitor is no longer following this profile')
+                return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=204)
+            except ObjectDoesNotExist:
+                print('Error: the object does not exist')
+                return JsonResponse({'msg': 'Error: the object does not exist'}, status=404)
+
+
+
 
 def login_view(request):
     if request.method == "POST":
