@@ -77,6 +77,18 @@ class ProfilePage(View):
 
         return render(request, self.template_name, context)
 
+    def _getFollowerObject(self, profile, visitor):
+        return Follower.objects.get(
+            user_follower = visitor,
+            user_being_followed = profile
+        )
+
+    def _createFollowerObject(self, profile, visitor):
+        return Follower.objects.create(
+            user_follower = visitor,
+            user_being_followed = profile
+        )
+
     def put(self, request, profileId):
         import json
 
@@ -90,16 +102,10 @@ class ProfilePage(View):
 
         if data['visitor_is_following']:
             try:
-                follower = Follower.objects.get(
-                    user_follower = visitor,
-                    user_being_followed = profile
-                )
+                self._getFollowerObject(profile, visitor)
             except ObjectDoesNotExist:
                 # create Follower, making the visitor follow this profile
-                follower = Follower.objects.create(
-                    user_follower = visitor,
-                    user_being_followed = profile
-                )
+                follower = self._createFollowerObject(profile, visitor)
                 follower.save()
                 return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=204)
             else:
@@ -107,16 +113,11 @@ class ProfilePage(View):
         else:
             # delete Follower
             try:
-                follower = Follower.objects.get(
-                    user_follower = visitor,
-                    user_being_followed = profile
-                )
+                follower = self._getFollowerObject(profile, visitor)
                 follower.delete()
                 return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=204)
             except ObjectDoesNotExist:
                 return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
-
-
 
 
 def login_view(request):
