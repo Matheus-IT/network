@@ -68,6 +68,7 @@ class ProfilePage(View):
         visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile_followers)
 
         context = {
+            'profile_id': profile.id,
             'username': profile.username,
             'n_of_followers': len(profile_followers),
             'n_following': len(profile_following),
@@ -107,7 +108,7 @@ class ProfilePage(View):
                 # create Follower, making the visitor follow this profile
                 follower = self._createFollowerObject(profile, visitor)
                 follower.save()
-                return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=204)
+                return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=200)
             else:
                 return JsonResponse({'msg': 'This visitor is already following this profile!'}, status=400)
         else:
@@ -115,7 +116,7 @@ class ProfilePage(View):
             try:
                 follower = self._getFollowerObject(profile, visitor)
                 follower.delete()
-                return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=204)
+                return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=200)
             except ObjectDoesNotExist:
                 return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
 

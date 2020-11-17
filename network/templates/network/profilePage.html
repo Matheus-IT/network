@@ -6,6 +6,88 @@
 	Profile Page
 {% endblock %}
 
+{% block otherStatics %}
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() {
+			const followBtn = document.querySelector('#followBtn');
+			followBtn.onclick = toggleFollowUnfollow;
+		});
+
+		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
+		var numOfFollowers = {{ n_of_followers }};
+
+		function toggleFollowUnfollow() {
+			const csrftoken = getCookie('csrftoken');
+
+			fetch("{% url 'profilePage' profile_id %}", {
+				method: 'PUT',
+				body: JSON.stringify({
+					visitor_is_following: ! visitorIsFollowing,
+				}),
+				headers: {
+					'X-CSRFToken': csrftoken
+				}
+			})
+			.then(response => response.json())
+			.then(data => {
+				visitorIsFollowing = ! visitorIsFollowing;
+				// update information because visitorIsFollowing has changed
+				updateNumOfFollowers(visitorIsFollowing);
+				updateFollowButton(visitorIsFollowing);
+			})
+			.catch(err => console.log(err));
+		}
+
+		function updateNumOfFollowers(visitorIsFollowing) {
+			if (visitorIsFollowing)
+				numOfFollowers++;
+			else
+				numOfFollowers--;
+			
+			document.querySelector('#followers').innerHTML = numOfFollowers;
+		}
+
+		function updateFollowButton(visitorIsFollowing) {
+			const followBtn = document.querySelector('#followBtn');
+
+			if (visitorIsFollowing)
+				followBtn.innerHTML = 'Unfollow';
+			else
+				followBtn.innerHTML = 'Follow';
+		}
+
+		function convertPythonBooleanToJsBoolean(input) {
+			try {
+				if (input === 'False')
+	        		return false;
+				else if (input === 'True')
+					return true;
+				else
+					throw 'Invalid argument';
+			} catch(err) {
+				console.log(`Error: ${err}`);
+			}
+		}
+
+		function getCookie(name) {
+			if (document.cookie && document.cookie !== '') {
+				var cookies = document.cookie.split(';');
+
+				for (let i = 0; i < cookies.length; i++) {
+					let cookie = cookies[i].trim();
+					// Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		            	var cookieValue = null;
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+				}
+			}
+			return cookieValue;
+		}
+	</script>
+{% endblock %}
+
 {% block body %}
 	<div class="container-sm profileContainer">
 		<div>
@@ -15,8 +97,8 @@
 			</h3>
 			
 			<h4 class="followNumbers">
-				<strong>{{ n_following }}</strong> following
-				<strong>{{ n_of_followers }}</strong> followers
+				<strong id="following">{{ n_following }}</strong> following
+				<strong id="followers">{{ n_of_followers }}</strong> followers
 			</h4>
 		</div>
 		

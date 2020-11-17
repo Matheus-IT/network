@@ -127,7 +127,7 @@ class ProfilePage(TestCase):
 		})
 		response = self.client.put(reverse('profilePage', kwargs={'profileId': mock_User1.id}), data)
 
-		self.assertEqual(response.status_code, 204)
+		self.assertEqual(response.status_code, 200)
 
 	def test_put_when_request_for_visitor_to_unfollow_the_current_profile(self):
 		""" The visitor IS following the current profile, then he makes a PUT request
@@ -152,7 +152,7 @@ class ProfilePage(TestCase):
 		})
 		response = self.client.put(reverse('profilePage', kwargs={'profileId': mock_User2.id}), data)
 
-		self.assertEqual(response.status_code, 204)
+		self.assertEqual(response.status_code, 200)
 
 	def test_bad_put_when_request_for_visitor_to_unfollow_the_current_profile(self):
 		""" The visitor IS NOT following the current profile, then he makes a PUT request
