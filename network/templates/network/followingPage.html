@@ -1,5 +1,22 @@
 {% extends './layout.html' %}
 
 {% block body %}
-	<h2>These are the posts of the users you follow</h2>
+
+	<div class="postsContainer">
+		<h2>Posts from the users you follow</h2>
+        <h4>Latest posts:</h4>
+
+        {% for post in posts_from_users_followed %}
+            <div class="post">
+                <h3>
+                    <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
+                </h3>
+                <p>{{ post.content }}</p>
+                <em>{{ post.timestamp }}</em>
+                <br>
+                <strong>Likes {{ post.likes }}</strong>
+                <br>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

@@ -1,9 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+
 from django.views import View
 
 from .models import User, Post, Follower
@@ -121,8 +125,18 @@ class ProfilePage(View):
                 return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
 
 
+@login_required
 def followingPage(request):
-    return render(request, 'network/followingPage.html')
+    current_user = request.user
+
+    # get a list of users being followed by the current user
+    followed_by_current_user = [follower.user_being_followed for follower in current_user.users_being_followed.all()]
+    # get a list of posts made by the users that the current user follow
+    posts_from_users_followed = [post for post in Post.objects.order_by('-timestamp').all() if post.poster in followed_by_current_user]
+
+    return render(request, 'network/followingPage.html', {
+        'posts_from_users_followed': posts_from_users_followed
+    })
 
 
 def login_view(request):
