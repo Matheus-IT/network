@@ -10,7 +10,9 @@
 	<script type="text/javascript">
 		document.addEventListener('DOMContentLoaded', function() {
 			const followBtn = document.querySelector('#followBtn');
-			followBtn.onclick = toggleFollowUnfollow;
+			
+			if (followBtn !== null)
+				followBtn.onclick = toggleFollowUnfollow;
 		});
 
 		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
