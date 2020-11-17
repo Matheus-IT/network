@@ -205,6 +205,41 @@ class ProfilePage(TestCase):
 		self.assertEqual(response.status_code, 404)
 
 
+class FollowingPage(TestCase):
+	def setUp(self):
+		self.mock_user1 = {
+			'username': 'test_user1',
+			'password': '12345',
+			'email': 'test_user1@example.com'
+		}
+		self.mock_user2 = {
+			'username': 'test_user2',
+			'password': '12345',
+			'email': 'test_user2@example.com'
+		}
+
+	def createUser(self, user):
+		return User.objects.create_user(
+			username=user['username'],
+			password=user['password'],
+			email=user['email']
+		)
+
+	def test_get(self):
+		self.createUser(self.mock_user1)
+		self.client.login(
+			username = self.mock_user1['username'],
+			password = self.mock_user1['password']
+		)
+		response = self.client.get(reverse('followingPage'))
+		
+		self.assertEqual(response.status_code, 200)
+
+	def test_bad_get(self):
+		response = self.client.get(reverse('followingPage'))
+		self.assertEqual(response.status_code, 302)
+
+
 class Login(TestCase):
 	def setUp(self):
 		self.mock_user = User.objects.create_user(
