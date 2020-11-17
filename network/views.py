@@ -121,6 +121,10 @@ class ProfilePage(View):
                 return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
 
 
+def followingPage(request):
+    return render(request, 'network/followingPage.html')
+
+
 def login_view(request):
     if request.method == "POST":
 
