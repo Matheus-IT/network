@@ -68,6 +68,7 @@ class ProfilePage(View):
         visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile_followers)
 
         context = {
+            'profile_id': profile.id,
             'username': profile.username,
             'n_of_followers': len(profile_followers),
             'n_following': len(profile_following),
@@ -76,6 +77,48 @@ class ProfilePage(View):
         }
 
         return render(request, self.template_name, context)
+
+    def _getFollowerObject(self, profile, visitor):
+        return Follower.objects.get(
+            user_follower = visitor,
+            user_being_followed = profile
+        )
+
+    def _createFollowerObject(self, profile, visitor):
+        return Follower.objects.create(
+            user_follower = visitor,
+            user_being_followed = profile
+        )
+
+    def put(self, request, profileId):
+        import json
+
+        try:
+            profile = User.objects.get(id=profileId)
+        except ObjectDoesNotExist:
+            return HttpResponse(status=404)
+
+        data = json.loads(request.body)
+        visitor = request.user
+
+        if data['visitor_is_following']:
+            try:
+                self._getFollowerObject(profile, visitor)
+            except ObjectDoesNotExist:
+                # create Follower, making the visitor follow this profile
+                follower = self._createFollowerObject(profile, visitor)
+                follower.save()
+                return JsonResponse({'msg': 'Success! Now the visitor is following this profile'}, status=200)
+            else:
+                return JsonResponse({'msg': 'This visitor is already following this profile!'}, status=400)
+        else:
+            # delete Follower
+            try:
+                follower = self._getFollowerObject(profile, visitor)
+                follower.delete()
+                return JsonResponse({'msg': 'Success! Now the visitor is no longer following this profile'}, status=200)
+            except ObjectDoesNotExist:
+                return JsonResponse({'msg': 'Error: the object does not exist'}, status=400)
 
 
 def login_view(request):
