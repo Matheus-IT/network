@@ -30,3 +30,11 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Auth {self.poster.username}: {self.content[:30]}... Timestamp: {self.timestamp}'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'poster': self.poster,
+            'content': self.content,
+            'timestamp': self.timestamp.strftime('%b %d %Y, %I:%M %p')
+        }
