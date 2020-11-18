@@ -36,5 +36,6 @@ class Post(models.Model):
             'id': self.id,
             'poster': self.poster.username,
             'content': self.content,
-            'timestamp': self.timestamp.strftime('%b %d %Y, %I:%M %p')
+            'timestamp': self.timestamp.strftime('%b %d %Y, %I:%M %p'),
+            'likes': self.likes
         }
