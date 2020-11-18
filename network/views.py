@@ -15,6 +15,7 @@ from .models import User, Post, Follower
 
 def index(request):
     from .forms import NewPostForm
+    from django.core.paginator import Paginator
 
     if request.method == 'POST':
         if request.user.is_authenticated:
@@ -28,17 +29,27 @@ def index(request):
                     content=newPostContent
                 )
                 newPost.save()
-
-                print('New post created successfully!')
         else:
             return HttpResponse(status=403)
 
     allPosts = Post.objects.order_by('-timestamp').all()
+    paginator = Paginator(allPosts, 10)
+
+    page_number = request.GET.get('page')
+
+    if page_number:
+        page = paginator.page(page_number)
+    else:
+        page = paginator.page(1)
 
     return render(request, "network/index.html", {
         'newPostForm': NewPostForm(),
-        'allPosts': allPosts
+        'current_page_posts': page.object_list,
+        'paginator': paginator
     })
+
+
+
 
 
 class ProfilePage(View):

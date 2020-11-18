@@ -4,6 +4,25 @@
 
 {% block otherStatics %}
     <script src="{% static 'network/styles/js/indexForStyles.js' %}"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.page-number').forEach((pageNum) => {
+                pageNum.addEventListener('click', handlePagination);
+            });
+        });
+
+        function handlePagination() {
+            const pageNumber = this.innerHTML;
+
+            fetch("{% url 'index' %}", {
+                method: 'GET',
+                body: JSON.stringify({
+                    page: pageNumber
+                })
+            })
+            .then();
+        }
+    </script>
 {% endblock%}
 
 {% block body %}
@@ -18,7 +37,7 @@
     <div class="postsContainer">
         <h2>Latest posts:</h2>
 
-        {% for post in allPosts %}
+        {% for post in current_page_posts %}
             <div class="post">
                 <h3>
                     <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
@@ -30,5 +49,17 @@
                 <br>
             </div>
         {% endfor %}
+        
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            {% for page in paginator.page_range %}
+                <li class="page-item">
+                    <button class="page-link page-number">{{ forloop.counter }}</button>
+                </li>
+            {% endfor %}
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
+        </nav>
     </div>
 {% endblock %}
