@@ -24,7 +24,18 @@
             navigateTo(currentNavigationPage);
 
             deactivateAllPageItems('.page-item');
-            this.parentNode.classList.add('active');
+            markAsActive(currentNavigationPage);
+        }
+
+        function markAsActive(currentPageNumber) {
+            navigationNumberButtons = document.querySelectorAll('.page-number');
+
+            navigationNumberButtons.forEach(pageNumButton => {
+                if (pageNumButton.innerHTML == currentPageNumber) {
+                    pageNumButton.parentNode.classList.add('active');
+                    return;
+                }
+            });
         }
 
         function handlePaginateToNextPage() {
@@ -32,7 +43,7 @@
             navigateTo(currentNavigationPage);
 
             deactivateAllPageItems('.page-item');
-            this.parentNode.classList.add('active');
+            markAsActive(currentNavigationPage);
         }
 
         function fetchPostsPage(pageNumber=1) {
@@ -51,7 +62,6 @@
             const postsContainer = document.querySelector('#postsWrapper');
             postsContainer.innerHTML = '';
 
-            // Next time I need to solve the problem with the Poster object - This comment is deletable
             currentPagePosts.forEach(post => {
                 postsContainer.innerHTML += `
                     <div class="post">
