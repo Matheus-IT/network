@@ -41,21 +41,36 @@ def index(request):
     })
 
 
-def getPostsPage(request, pageNumber=1):
-    from django.core.paginator import Paginator
+def getPostsPage(request, pageNumber=1, filterUserId=None):
+    from django.core.paginator import Paginator, EmptyPage
 
-    allPosts = Post.objects.order_by('-timestamp').all()
+    if filterUserId:
+        # try to filter the posts given the user id
+        try:
+            filtered_user = User.objects.get(id=filterUserId)
+        except ObjectDoesNotExist:
+            return JsonResponse({'msg': 'This user doesn\'t exist'}, status=404)
 
-    paginator = Paginator(allPosts, 10)
-    page = paginator.page(pageNumber)
+        all_posts = Post.objects.order_by('-timestamp').filter(poster=filtered_user)
+    else:
+        all_posts = Post.objects.order_by('-timestamp').all()
+
+    POSTS_PER_PAGE = 10
+    paginator = Paginator(all_posts, POSTS_PER_PAGE)
+
+    try:
+        page = paginator.page(pageNumber)
+    except EmptyPage:
+        return JsonResponse({'msg': 'This page doesn\'t exist'}, status=404)
+    
     current_page_posts = [post.serialize() for post in page.object_list]
 
-    page_return = {
+    posts_page = {
         'hasNext': page.has_next(),
         'hasPrevious': page.has_previous(),
         'currentPagePosts': current_page_posts
     }
-    return JsonResponse(page_return)
+    return JsonResponse(posts_page)
 
 
 class ProfilePage(View):

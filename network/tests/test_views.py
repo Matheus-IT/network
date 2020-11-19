@@ -4,7 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 
 import json
 
-from ..models import User, Follower
+from ..models import User, Follower, Post
 
 
 class Index(TestCase):
@@ -44,6 +44,92 @@ class Index(TestCase):
 		response = index(request)
 
 		self.assertEqual(response.status_code, 403)
+
+
+class GetPostsPage(TestCase):
+	def setUp(self):
+		self.mock_user1 = {
+			'username': 'test_user1',
+			'password': '12345',
+			'email': 'test_user1@example.com'
+		}
+		self.mock_user2 = {
+			'username': 'test_user2',
+			'password': '12345',
+			'email': 'test_user2@example.com'
+		}
+
+		self.mock_User1 = self.createUser(self.mock_user1)
+		self.mock_User2 = self.createUser(self.mock_user2)
+
+		# the user makes some posts for test proposes
+		self.generatePosts(30, self.mock_User1)
+	
+	def createUser(self, user):
+		return User.objects.create_user(
+			username=user['username'],
+			password=user['password'],
+			email=user['email']
+		)
+	
+	def generatePosts(self, numPosts, user):
+		for i in range(numPosts):
+			newPostContent = f'content {i}'
+
+			newPost = Post.objects.create(
+				poster=user,
+				content=newPostContent
+			)
+			newPost.save()
+		
+	def test_get_posts_given_a_page_number(self):
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		response = self.client.get(reverse('getPostsPage', kwargs={'pageNumber': 1}))
+		self.assertEqual(response.status_code, 200)
+	
+	def test_bad_get_posts_given_a_non_existing_page_number(self):
+		""" This case should fail because I'm trying to get a posts 
+			page that doesn't exist """
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		response = self.client.get(reverse('getPostsPage', kwargs={'pageNumber': 5}))
+		self.assertEqual(response.status_code, 404)
+	
+	def test_get_posts_given_a_page_number_and_a_profile_id(self):
+		# mock_user2 requests some posts from mock_user1
+		self.client.login(
+			username=self.mock_user2['username'],
+			password=self.mock_user2['password']
+		)
+
+		response = self.client.get(reverse('getPostsPage', kwargs={
+			'pageNumber': 1,
+			'filterUserId': self.mock_User1.id
+		}))
+
+		self.assertEqual(response.status_code, 200)
+	
+	def test_bad_get_posts_given_a_page_number_and_a_non_existing_profile_id(self):
+		""" this case fails because mock_user1 requests some posts
+			from a non existing user """
+		self.client.login(
+			username=self.mock_user2['username'],
+			password=self.mock_user2['password']
+		)
+
+		response = self.client.get(reverse('getPostsPage', kwargs={
+			'pageNumber': 1,
+			'filterUserId': 5
+		}))
+		
+		self.assertEqual(response.status_code, 404)
 
 
 class ProfilePage(TestCase):
