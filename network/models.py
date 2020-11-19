@@ -5,7 +5,11 @@ from django.forms.widgets import Textarea
 # adicional models: posts, likes, and followers
 
 class User(AbstractUser):
-    pass
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username
+        }
 
 
 class Follower(models.Model):
@@ -34,7 +38,7 @@ class Post(models.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'poster': self.poster.username,
+            'poster': self.poster.serialize(),
             'content': self.content,
             'timestamp': self.timestamp.strftime('%b %d %Y, %I:%M %p'),
             'likes': self.likes
