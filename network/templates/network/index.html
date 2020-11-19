@@ -5,22 +5,97 @@
 {% block otherStatics %}
     <script src="{% static 'network/styles/js/indexForStyles.js' %}"></script>
     <script type="text/javascript">
+        var currentNavigationPage;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // navigate to the first page when first time
+            navigateTo(1);
+            
             document.querySelectorAll('.page-number').forEach((pageNum) => {
-                pageNum.addEventListener('click', handlePagination);
+                pageNum.addEventListener('click', handlePaginationByNumbers);
             });
+
+            document.querySelector('#previousPage').addEventListener('click', handlePaginateToPreviousPage);
+            document.querySelector('#nextPage').addEventListener('click', handlePaginateToNextPage);
         });
 
-        function handlePagination() {
-            const pageNumber = this.innerHTML;
+        function handlePaginateToPreviousPage() {
+            currentNavigationPage--;
+            navigateTo(currentNavigationPage);
 
-            fetch("{% url 'index' %}", {
-                method: 'GET',
-                body: JSON.stringify({
-                    page: pageNumber
-                })
+            deactivateAllPageItems('.page-item');
+            this.parentNode.classList.add('active');
+        }
+
+        function handlePaginateToNextPage() {
+            currentNavigationPage++;
+            navigateTo(currentNavigationPage);
+
+            deactivateAllPageItems('.page-item');
+            this.parentNode.classList.add('active');
+        }
+
+        function fetchPostsPage(pageNumber=1) {
+            fetch(`/getPostsPage/${pageNumber}`)
+            .then(response => response.json())
+            .then(postsPage => {
+                generatePosts(postsPage.currentPagePosts);
+
+                handleHideShow(postsPage.hasPrevious, 'previousPage');
+                handleHideShow(postsPage.hasNext, 'nextPage');
             })
-            .then();
+            .catch(err => console.log(err));
+        }
+
+        function generatePosts(currentPagePosts) {
+            const postsContainer = document.querySelector('#postsWrapper');
+            postsContainer.innerHTML = '';
+
+            // Next time I need to solve the problem with the Poster object - This comment is deletable
+            currentPagePosts.forEach(post => {
+                postsContainer.innerHTML += `
+                    <div class="post">
+                        <h3>
+                            <a href="/profile/${post.poster.id}">${post.poster.username}</a> says
+                        </h3>
+                        <p>${post.content}</p>
+                        <em>${post.timestamp}</em>
+                        <br>
+                        <strong>Likes${post.likes}</strong>
+                        <br>
+                    </div>
+                `;
+            });
+        }
+
+        function handleHideShow(hasThisPage, pageId) {
+            const page = document.querySelector(`#${pageId}`);
+            
+            if (hasThisPage)
+                page.style.display = 'block';
+            else
+                page.style.display = 'none'
+        }
+
+        function handlePaginationByNumbers() {
+            const pageNumber = this.innerHTML;
+            navigateTo(pageNumber);
+
+            deactivateAllPageItems('.page-item');
+            this.parentNode.classList.add('active');
+        }
+
+        function navigateTo(pageNumber) {
+            fetchPostsPage(pageNumber);
+            currentNavigationPage = pageNumber;
+        }
+
+        function deactivateAllPageItems(className) {
+            const pageItems = document.querySelectorAll(className);
+            
+            pageItems.forEach(item => {
+                item.classList.remove('active');
+            });
         }
     </script>
 {% endblock%}
@@ -29,7 +104,7 @@
     <form action="{% url 'index' %}" method="POST" class="newPostArea">
         {% csrf_token %}
 
-        {{ newPostForm }}
+        {{ new_post_form }}
 
         <button id="submitNewPost" class="btn btn-primary" button>Post</button>
     </form>
@@ -37,28 +112,25 @@
     <div class="postsContainer">
         <h2>Latest posts:</h2>
 
-        {% for post in current_page_posts %}
-            <div class="post">
-                <h3>
-                    <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
-                </h3>
-                <p>{{ post.content }}</p>
-                <em>{{ post.timestamp }}</em>
-                <br>
-                <strong>Likes {{ post.likes }}</strong>
-                <br>
-            </div>
-        {% endfor %}
+        <div id="postsWrapper">
+            <!-- Posts from AJAX will be generated here -->
+        </div>
         
         <nav aria-label="Page navigation example">
           <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            {% for page in paginator.page_range %}
+            <li class="page-item">
+                <button id="previousPage" class="page-link">Previous</button>
+            </li>
+            
+            {% for i in page_range %}
                 <li class="page-item">
                     <button class="page-link page-number">{{ forloop.counter }}</button>
                 </li>
             {% endfor %}
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            
+            <li class="page-item">
+                <button id="nextPage" class="page-link">Next</button>
+            </li>
           </ul>
         </nav>
     </div>

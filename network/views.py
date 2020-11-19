@@ -35,21 +35,27 @@ def index(request):
     allPosts = Post.objects.order_by('-timestamp').all()
     paginator = Paginator(allPosts, 10)
 
-    page_number = request.GET.get('page')
-
-    if page_number:
-        page = paginator.page(page_number)
-    else:
-        page = paginator.page(1)
-
     return render(request, "network/index.html", {
-        'newPostForm': NewPostForm(),
-        'current_page_posts': page.object_list,
-        'paginator': paginator
+        'new_post_form': NewPostForm(),
+        'page_range': paginator.page_range
     })
 
 
+def getPostsPage(request, pageNumber=1):
+    from django.core.paginator import Paginator
 
+    allPosts = Post.objects.order_by('-timestamp').all()
+
+    paginator = Paginator(allPosts, 10)
+    page = paginator.page(pageNumber)
+    current_page_posts = [post.serialize() for post in page.object_list]
+
+    page_return = {
+        'hasNext': page.has_next(),
+        'hasPrevious': page.has_previous(),
+        'currentPagePosts': current_page_posts
+    }
+    return JsonResponse(page_return)
 
 
 class ProfilePage(View):
