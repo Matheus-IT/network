@@ -10,6 +10,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // navigate to the first page when first time
             navigateTo(1);
+            markAsActive(currentNavigationPage);
             
             document.querySelectorAll('.page-number').forEach((pageNum) => {
                 pageNum.addEventListener('click', handlePaginationByNumbers);
@@ -92,7 +93,7 @@
             navigateTo(pageNumber);
 
             deactivateAllPageItems('.page-item');
-            this.parentNode.classList.add('active');
+            markAsActive(currentNavigationPage);
         }
 
         function navigateTo(pageNumber) {
