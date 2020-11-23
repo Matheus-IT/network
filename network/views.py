@@ -91,6 +91,8 @@ class ProfilePage(View):
         return False
 
     def get(self, request, profileId):
+        from django.core.paginator import Paginator
+        
         try:
             profile = User.objects.get(id=profileId)
         except ObjectDoesNotExist:
@@ -103,13 +105,16 @@ class ProfilePage(View):
 
         visitor_is_following = self._checkVisitorIsFollowingThisProfile(request, profile_followers)
 
+        paginator = Paginator(profile_posts, 10)
+        
         context = {
             'profile_id': profile.id,
             'username': profile.username,
             'n_of_followers': len(profile_followers),
             'n_following': len(profile_following),
             'profile_posts': profile_posts,
-            'visitor_is_following': visitor_is_following
+            'visitor_is_following': visitor_is_following,
+            'page_range': paginator.page_range
         }
 
         return render(request, self.template_name, context)

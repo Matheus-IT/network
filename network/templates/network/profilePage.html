@@ -8,6 +8,116 @@
 
 {% block otherStatics %}
 	<script type="text/javascript">
+		// JAVASCRIPT RELATED TO PAGINATION
+
+		var currentNavigationPage;
+
+		document.addEventListener('DOMContentLoaded', function() {
+			// navigate to the first page when first time
+			navigateTo(1);
+			markAsActive(currentNavigationPage);
+			
+			document.querySelectorAll('.page-number').forEach((pageNum) => {
+				pageNum.addEventListener('click', handlePaginationByNumbers);
+			});
+
+			document.querySelector('#previousPage').addEventListener('click', handlePaginateToPreviousPage);
+			document.querySelector('#nextPage').addEventListener('click', handlePaginateToNextPage);
+		});
+
+		function handlePaginateToPreviousPage() {
+			currentNavigationPage--;
+			navigateTo(currentNavigationPage);
+
+			deactivateAllPageItems('.page-item');
+			markAsActive(currentNavigationPage);
+		}
+
+		function markAsActive(currentPageNumber) {
+			navigationNumberButtons = document.querySelectorAll('.page-number');
+
+			navigationNumberButtons.forEach(pageNumButton => {
+				if (pageNumButton.innerHTML == currentPageNumber) {
+					pageNumButton.parentNode.classList.add('active');
+					return;
+				}
+			});
+		}
+
+		function handlePaginateToNextPage() {
+			currentNavigationPage++;
+			navigateTo(currentNavigationPage);
+
+			deactivateAllPageItems('.page-item');
+			markAsActive(currentNavigationPage);
+		}
+
+		function fetchPostsPage(pageNumber=1) {
+			// Using a variable from django
+			const profileId = {{ profile_id }};
+			
+			fetch(`/getPostsPage/${pageNumber}/${profileId}`)
+			.then(response => response.json())
+			.then(postsPage => {
+				generatePosts(postsPage.currentPagePosts);
+
+				handleHideShow(postsPage.hasPrevious, 'previousPage');
+				handleHideShow(postsPage.hasNext, 'nextPage');
+			})
+			.catch(err => console.log(err));
+		}
+
+		function generatePosts(currentPagePosts) {
+			const postsContainer = document.querySelector('#postsWrapper');
+			postsContainer.innerHTML = '';
+
+			currentPagePosts.forEach(post => {
+				postsContainer.innerHTML += `
+					<div class="post">
+						<h3>
+							<a href="/profile/${post.poster.id}">${post.poster.username}</a> says
+						</h3>
+						<p>${post.content}</p>
+						<em>${post.timestamp}</em>
+						<br>
+						<strong>Likes${post.likes}</strong>
+						<br>
+					</div>
+				`;
+			});
+		}
+
+		function handleHideShow(hasThisPage, pageId) {
+			const page = document.querySelector(`#${pageId}`);
+			
+			if (hasThisPage)
+				page.style.display = 'block';
+			else
+				page.style.display = 'none'
+		}
+
+		function handlePaginationByNumbers() {
+			const pageNumber = this.innerHTML;
+			navigateTo(pageNumber);
+
+			deactivateAllPageItems('.page-item');
+			markAsActive(currentNavigationPage);
+		}
+
+		function navigateTo(pageNumber) {
+			fetchPostsPage(pageNumber);
+			currentNavigationPage = pageNumber;
+		}
+
+		function deactivateAllPageItems(className) {
+			const pageItems = document.querySelectorAll(className);
+			
+			pageItems.forEach(item => {
+				item.classList.remove('active');
+			});
+		}
+
+		/* JAVASCRIPT RELATED TO FOLLOWING */
 		document.addEventListener('DOMContentLoaded', function() {
 			const followBtn = document.querySelector('#followBtn');
 			
@@ -15,6 +125,7 @@
 				followBtn.onclick = toggleFollowUnfollow;
 		});
 
+		// Using some variables from django
 		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
 		var numOfFollowers = {{ n_of_followers }};
 
@@ -118,19 +229,26 @@
 	<div class="postsContainer">
 		<h2>Latest posts:</h2>
 
-		{% for post in profile_posts %}
-			<div class="post">
-				<h3>
-						<a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
-				</h3>
-				<p>{{ post.content }}</p>
-				<em>{{ post.timestamp }}</em>
-				<br>
-				<strong>Likes {{ post.likes }}</strong>
-				<br>
-			</div>
-		{% empty %}
-			<h2>There are no posts here yet...</h2>
-		{% endfor %}
+		<div id="postsWrapper">
+            <!-- Posts from AJAX will be generated here -->
+		</div>
+		
+		<nav aria-label="Page navigation example">
+			<ul class="pagination">
+			  <li class="page-item">
+				  <button id="previousPage" class="page-link">Previous</button>
+			  </li>
+			  
+			  {% for i in page_range %}
+				  <li class="page-item">
+					  <button class="page-link page-number">{{ forloop.counter }}</button>
+				  </li>
+			  {% endfor %}
+			  
+			  <li class="page-item">
+				  <button id="nextPage" class="page-link">Next</button>
+			  </li>
+			</ul>
+		  </nav>
 	</div>
 {% endblock %}
