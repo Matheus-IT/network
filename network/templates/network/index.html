@@ -6,6 +6,20 @@
     <script src="{% static 'network/styles/js/indexForStyles.js' %}"></script>
     <script type="text/javascript">
         var currentNavigationPage;
+        var isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+
+        function convertPythonBooleanToJsBoolean(input) {
+			try {
+				if (input === 'False')
+	        		return false;
+				else if (input === 'True')
+					return true;
+				else
+					throw 'Invalid argument';
+			} catch(err) {
+				console.log(`Error: ${err}`);
+			}
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             // navigate to the first page when first time
@@ -61,22 +75,80 @@
 
         function generatePosts(currentPagePosts) {
             const postsContainer = document.querySelector('#postsWrapper');
+            
             postsContainer.innerHTML = '';
-
-            currentPagePosts.forEach(post => {
-                postsContainer.innerHTML += `
-                    <div class="post">
-                        <h3>
-                            <a href="/profile/${post.poster.id}">${post.poster.username}</a> says
-                        </h3>
-                        <p>${post.content}</p>
-                        <em>${post.timestamp}</em>
-                        <br>
-                        <strong>Likes${post.likes}</strong>
-                        <br>
-                    </div>
+            currentPagePosts.forEach((post, index) => {
+                const markupPost = document.createElement('div');
+                
+                markupPost.setAttribute('class', 'post');
+                markupPost.innerHTML = `
+                    <h3>
+                        <a href="/profile/${post.poster.id}">${post.poster.username}</a> says
+                    </h3>
+                    <p>${post.content}</p>
+                    <em>${post.timestamp}</em>
+                    <br>
                 `;
+                
+                if (isUserAuthenticated) {
+                    let likeIcon = document.createElement('img');
+
+                    likeIcon.setAttribute('class', 'likeIcon');
+                    likeIcon.setAttribute('id', `likeIcon${index+1}`);
+                    
+                    if (post.does_current_visitor_like_this_post) {
+                        likeIcon.setAttribute('src', '{% static "network/icons/heart-solid.png" %}');
+                    } else {
+                        likeIcon.setAttribute('src', '{% static "network/icons/heart-regular.png" %}');
+                    }
+                    
+                    markupPost.appendChild(likeIcon);
+
+                    const selector = `#likeIcon${index+1}`;
+                    watchElementUntilAbleToAddEvent(selector, post);
+                }
+
+                markupPost.innerHTML += `
+                    <strong>${post.number_likes}</strong>
+                    <br>
+                `;
+
+                postsContainer.append(markupPost);
             });
+        }
+
+        function watchElementUntilAbleToAddEvent(selector, postData) {
+            const observer = new MutationObserver(function(mutationsList, observer) {
+                const likeIcon = document.querySelector(selector);
+                // verify the likeIcon of this post, when it's available add a handler 
+                if (likeIcon) {
+                    likeIcon.onclick = () => handleLikeDislike(postData);
+                    observer.disconnect();
+                }
+            });
+
+            // the observer is going to watch for document changes
+            const targetNode = document;
+            const config = { childList: true, subtree: true };
+
+            observer.observe(targetNode, config);
+        }
+
+        function handleLikeDislike(postData) {
+            console.log(postData);
+
+            if (postData.does_current_visitor_like_this_post) {
+                // dislike
+                postData.number_likes--;
+            } else {
+                // like
+                postData.number_likes++;
+            }
+
+            // it's going to invert the options after discounting the number of likes
+            postData.does_current_visitor_like_this_post = ! postData.does_current_visitor_like_this_post;
+
+            // now I'm going to make the view for my api to handle the like and dislike - this comment is deletable
         }
 
         function handleHideShow(hasThisPage, pageId) {

@@ -41,6 +41,13 @@ def index(request):
     })
 
 
+def doesThisUserLikeThisPost(user, post):
+    for like in post['likes']:
+        if user.id == like['liker_id']:
+            return True
+    return False
+
+
 def getPostsPage(request, pageNumber=1, filterUserId=None):
     from django.core.paginator import Paginator, EmptyPage
 
@@ -64,6 +71,9 @@ def getPostsPage(request, pageNumber=1, filterUserId=None):
         return JsonResponse({'msg': 'This page doesn\'t exist'}, status=404)
     
     current_page_posts = [post.serialize() for post in page.object_list]
+    
+    for post in current_page_posts:
+        post['does_current_visitor_like_this_post'] = doesThisUserLikeThisPost(request.user, post)
 
     posts_page = {
         'hasNext': page.has_next(),
