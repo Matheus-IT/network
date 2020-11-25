@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from django.views import View
 
-from .models import User, Post, Follower
+from .models import User, Post, Follower, Like
 
 
 def index(request):
@@ -81,6 +81,37 @@ def getPostsPage(request, pageNumber=1, filterUserId=None):
         'currentPagePosts': current_page_posts
     }
     return JsonResponse(posts_page)
+
+
+def handleLikeDislike(request, postId):
+    import json
+    
+    try:
+        post = Post.objects.get(id=postId)
+    except ObjectDoesNotExist:
+        return JsonResponse({'msg': 'No post found with this id'}, status=404)
+    
+    data = json.loads(request.body)
+    visitor = request.user
+
+    if data['does_current_visitor_like_this_post']:
+        try:
+            # verify if the user is trying to like for the second time
+            like = post.likes.get(liker=visitor)
+            if like:
+                return JsonResponse({'msg': 'Error: You can\'t like the same post two times'}, status=400)
+        except ObjectDoesNotExist:
+            like = Like.objects.create(liker=visitor, post=post)
+            like.save()
+            return JsonResponse(post.serialize(), status=200)
+    else:
+        # dislike
+        try:
+            like = post.likes.get(liker=visitor)
+            like.delete()
+            return JsonResponse(post.serialize(), status=200)
+        except ObjectDoesNotExist:
+            return JsonResponse({'msg': 'Error: You tried to dislike someone you don\'t like'}, status=400)
 
 
 class ProfilePage(View):

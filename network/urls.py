@@ -10,6 +10,8 @@ urlpatterns = [
     path('getPostsPage/<int:pageNumber>', views.getPostsPage, name='getPostsPage'),
     path('getPostsPage/<int:pageNumber>/<int:filterUserId>', views.getPostsPage, name='getPostsPage'),
 
+    path('handleLikeDislike/<int:postId>', views.handleLikeDislike, name='handleLikeDislike'),
+
     path("profile/<int:profileId>", views.ProfilePage.as_view(), name="profilePage"),
     path('following/', views.followingPage, name='followingPage'),
 

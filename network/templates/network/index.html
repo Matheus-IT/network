@@ -73,70 +73,79 @@
             .catch(err => console.log(err));
         }
 
-        function generatePosts(currentPagePosts) {
+        function generatePosts(currentPagePostsData) {
             const postsContainer = document.querySelector('#postsWrapper');
             
             postsContainer.innerHTML = '';
-            currentPagePosts.forEach((post, index) => {
-                const markupPost = document.createElement('div');
+            currentPagePostsData.forEach(postData => {
+                const post = document.createElement('div');
                 
-                markupPost.setAttribute('class', 'post');
-                markupPost.innerHTML = `
+                post.setAttribute('class', 'post');
+                post.setAttribute('id', `post${postData.id}`);
+                post.innerHTML = `
                     <h3>
-                        <a href="/profile/${post.poster.id}">${post.poster.username}</a> says
+                        <a href="/profile/${postData.poster.id}">${postData.poster.username}</a> says
                     </h3>
-                    <p>${post.content}</p>
-                    <em>${post.timestamp}</em>
+                    <p>${postData.content}</p>
+                    <em>${postData.timestamp}</em>
                     <br>
                 `;
                 
                 if (isUserAuthenticated) {
-                    let likeIcon = document.createElement('img');
+                    const likeIcon = generateLikeIcon(postData);
+                    post.append(likeIcon);
 
-                    likeIcon.setAttribute('class', 'likeIcon');
-                    likeIcon.setAttribute('id', `likeIcon${index+1}`);
-                    
-                    if (post.does_current_visitor_like_this_post) {
-                        likeIcon.setAttribute('src', '{% static "network/icons/heart-solid.png" %}');
-                    } else {
-                        likeIcon.setAttribute('src', '{% static "network/icons/heart-regular.png" %}');
-                    }
-                    
-                    markupPost.appendChild(likeIcon);
-
-                    const selector = `#likeIcon${index+1}`;
-                    watchElementUntilAbleToAddEvent(selector, post);
+                    // add the event handler when the like icon is available
+                    observeElementResolveWhenAvailable(`#likeIcon${postData.id}`)
+                    .then(likeIcon => likeIcon.onclick = () => handleLikeDislike(postData))
+                    .catch(err => console.log(err));
                 }
 
-                markupPost.innerHTML += `
-                    <strong>${post.number_likes}</strong>
+                post.innerHTML += `
+                    <strong class="numLikes">${postData.number_likes}</strong>
                     <br>
                 `;
 
-                postsContainer.append(markupPost);
+                postsContainer.append(post);
             });
         }
 
-        function watchElementUntilAbleToAddEvent(selector, postData) {
-            const observer = new MutationObserver(function(mutationsList, observer) {
-                const likeIcon = document.querySelector(selector);
-                // verify the likeIcon of this post, when it's available add a handler 
-                if (likeIcon) {
-                    likeIcon.onclick = () => handleLikeDislike(postData);
-                    observer.disconnect();
-                }
-            });
+        function generateLikeIcon(postData) {
+            let likeIcon = document.createElement('img');
 
-            // the observer is going to watch for document changes
-            const targetNode = document;
-            const config = { childList: true, subtree: true };
-
-            observer.observe(targetNode, config);
+            likeIcon.setAttribute('class', 'likeIcon');
+            likeIcon.setAttribute('id', `likeIcon${postData.id}`);
+            
+            if (postData.does_current_visitor_like_this_post) {
+                likeIcon.setAttribute('src', '{% static "network/icons/heart-solid.png" %}');
+            } else {
+                likeIcon.setAttribute('src', '{% static "network/icons/heart-regular.png" %}');
+            }
+            
+            return likeIcon;
         }
 
-        function handleLikeDislike(postData) {
-            console.log(postData);
+        function observeElementResolveWhenAvailable(selector) {
+            return new Promise((resolve, reject) => {
+                const observer = new MutationObserver(function(mutationsList, observer) {
+                    const element = document.querySelector(selector);
+                    
+                    // verify if the element is available
+                    if (element) {
+                        observer.disconnect();
+                        resolve(element);
+                    }
+                });
 
+                // the observer is going to watch for document changes
+                const targetNode = document;
+                const config = { childList: true, subtree: true };
+
+                observer.observe(targetNode, config); 
+            });
+        }
+
+        function handleLikeDislike(postData) {            
             if (postData.does_current_visitor_like_this_post) {
                 // dislike
                 postData.number_likes--;
@@ -144,12 +153,52 @@
                 // like
                 postData.number_likes++;
             }
-
-            // it's going to invert the options after discounting the number of likes
+            
             postData.does_current_visitor_like_this_post = ! postData.does_current_visitor_like_this_post;
 
-            // now I'm going to make the view for my api to handle the like and dislike - this comment is deletable
+            fetch(`/handleLikeDislike/${postData.id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    does_current_visitor_like_this_post: postData.does_current_visitor_like_this_post,
+                    number_likes: postData.number_likes
+                }),
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const post = document.querySelector(`#post${data.id}`);
+
+                post.querySelector('.numLikes').innerHTML = data.number_likes;
+
+                const likeIcon = post.querySelector(`#likeIcon${data.id}`);
+
+                if (postData.does_current_visitor_like_this_post) {
+                    likeIcon.setAttribute('src', '{% static "network/icons/heart-solid.png" %}');
+                } else {
+                    likeIcon.setAttribute('src', '{% static "network/icons/heart-regular.png" %}');
+                }
+            })
+            .catch(err => console.log(err));
         }
+
+        function getCookie(name) {
+			if (document.cookie && document.cookie !== '') {
+				var cookies = document.cookie.split(';');
+
+				for (let i = 0; i < cookies.length; i++) {
+					let cookie = cookies[i].trim();
+					// Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		            	var cookieValue = null;
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+				}
+			}
+			return cookieValue;
+		}
 
         function handleHideShow(hasThisPage, pageId) {
             const page = document.querySelector(`#${pageId}`);
