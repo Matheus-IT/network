@@ -8,9 +8,13 @@
 
 {% block otherStatics %}
 	<script type="text/javascript">
-
 		var currentNavigationPage;
-		var isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+		
+		/* GLOBAL VARIABLES FROM DJANGO */
+		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+		const profileId = Number.parseInt('{{ profile_id }}');
+		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
+		var numOfFollowers = Number.parseInt('{{ n_of_followers }}');
 		
 		// JAVASCRIPT RELATED TO PAGINATION
 		
@@ -27,8 +31,24 @@
 			document.querySelector('#nextPage').addEventListener('click', handlePaginateToNextPage);
 		});
 
+		function handlePaginationByNumbers() {
+			const pageNumber = this.innerHTML;
+			navigateTo(pageNumber);
+
+			deactivateAllPageItems('.page-item');
+			markAsActive(currentNavigationPage);
+		}
+
 		function handlePaginateToPreviousPage() {
 			currentNavigationPage--;
+			navigateTo(currentNavigationPage);
+
+			deactivateAllPageItems('.page-item');
+			markAsActive(currentNavigationPage);
+		}
+		
+		function handlePaginateToNextPage() {
+			currentNavigationPage++;
 			navigateTo(currentNavigationPage);
 
 			deactivateAllPageItems('.page-item');
@@ -46,20 +66,12 @@
 			});
 		}
 
-		function handlePaginateToNextPage() {
-			currentNavigationPage++;
-			navigateTo(currentNavigationPage);
-
-			deactivateAllPageItems('.page-item');
-			markAsActive(currentNavigationPage);
-		}
+		
 
 		// JAVASCRIPT RELATED TO POSTS STUFF		
 
 		function fetchPostsPage(pageNumber=1) {
-			// Using a variable from django
-			const profileId = {{ profile_id }};
-			
+			// using global variable 'profileId' from django
 			fetch(`/getPostsPage/${pageNumber}/${profileId}`)
 			.then(response => response.json())
 			.then(postsPage => {
@@ -190,13 +202,7 @@
 				page.style.display = 'none'
 		}
 
-		function handlePaginationByNumbers() {
-			const pageNumber = this.innerHTML;
-			navigateTo(pageNumber);
-
-			deactivateAllPageItems('.page-item');
-			markAsActive(currentNavigationPage);
-		}
+		
 
 		function navigateTo(pageNumber) {
 			fetchPostsPage(pageNumber);
@@ -219,13 +225,10 @@
 				followBtn.onclick = toggleFollowUnfollow;
 		});
 
-		// Using some variables from django
-		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
-		var numOfFollowers = {{ n_of_followers }};
-
 		function toggleFollowUnfollow() {
 			const csrftoken = getCookie('csrftoken');
 
+			// using global 'visitorIsFollowing' from django
 			fetch("{% url 'profilePage' profile_id %}", {
 				method: 'PUT',
 				body: JSON.stringify({
@@ -246,6 +249,7 @@
 		}
 
 		function updateNumOfFollowers(visitorIsFollowing) {
+			// using global 'numOfFollowers' from django
 			if (visitorIsFollowing)
 				numOfFollowers++;
 			else
