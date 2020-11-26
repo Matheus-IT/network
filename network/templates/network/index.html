@@ -233,13 +233,15 @@
 {% endblock%}
 
 {% block body %}
-    <form action="{% url 'index' %}" method="POST" class="newPostArea">
-        {% csrf_token %}
+    {% if user.is_authenticated %}
+        <form action="{% url 'index' %}" method="POST" class="newPostArea">
+            {% csrf_token %}
 
-        {{ new_post_form }}
+            {{ new_post_form }}
 
-        <button id="submitNewPost" class="btn btn-primary" button>Post</button>
-    </form>
+            <button id="submitNewPost" class="btn btn-primary" button>Post</button>
+        </form>
+    {% endif %}
 
     <div class="postsContainer">
         <h2>Latest posts:</h2>
