@@ -47,6 +47,7 @@ class Index(TestCase):
 
 
 class GetPostsPage(TestCase):
+	
 	def setUp(self):
 		self.mock_user1 = {
 			'username': 'test_user1',
@@ -130,6 +131,157 @@ class GetPostsPage(TestCase):
 		}))
 		
 		self.assertEqual(response.status_code, 404)
+
+
+class HandleLikeDislike(TestCase):
+	def setUp(self):
+		self.mock_user1 = {
+			'username': 'test_user1',
+			'password': '12345',
+			'email': 'test_user1@example.com'
+		}
+		self.mock_user2 = {
+			'username': 'test_user2',
+			'password': '12345',
+			'email': 'test_user2@example.com'
+		}
+
+		self.mock_User1 = self.createUser(self.mock_user1)
+		self.mock_User2 = self.createUser(self.mock_user2)
+
+		# the user makes some posts for test proposes
+		self.generatePosts(3, self.mock_User2)
+
+	def createUser(self, user):
+		return User.objects.create_user(
+			username=user['username'],
+			password=user['password'],
+			email=user['email']
+		)
+	
+	def generatePosts(self, numPosts, user):
+		for i in range(numPosts):
+			newPostContent = f'content {i}'
+
+			newPost = Post.objects.create(
+				poster=user,
+				content=newPostContent
+			)
+			newPost.save()
+	
+	def doesThisUserLikeThisPost(self, user, post):
+		for like in post['likes']:
+			if user.id == like['liker_id']:
+				return True
+		return False
+
+	def test_like_a_particular_post(self):
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		post = Post.objects.get(id=1)
+		post = post.serialize()
+
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, post)
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': not does_current_visitor_like_this_post,
+			'number_likes': post['number_likes']
+		})
+
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		self.assertEqual(response.status_code, 200)
+	
+	def test_bad_like_a_particular_post_when_already_liking(self):
+		""" This test case should raise an exception because the visitor already likes this post
+			and is trying to like it again """
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		post = Post.objects.get(id=1).serialize()
+
+		# At first, the visitor doesn't like this post, then he likes the post
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, post)
+		
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': not does_current_visitor_like_this_post,
+			'number_likes': post['number_likes']
+		})
+		# request to like this post
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		# And then the visitor tries to like again, so he's gonna receive an exception
+		response_post = response.json()
+
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, response_post)
+
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': does_current_visitor_like_this_post,
+			'number_likes': response_post['number_likes']
+		})
+		# request to like this post again
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		self.assertEqual(response.status_code, 400)
+	
+	def test_dislike_a_particular_post(self):
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		post = Post.objects.get(id=1).serialize()
+
+		# At first, the visitor doesn't like this post, then he likes the post
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, post)
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': not does_current_visitor_like_this_post,
+			'number_likes': post['number_likes']
+		})
+		# request to like this post
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		# And then the visitor tries to dislike the post
+		response_post = response.json()
+		
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, response_post)
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': not does_current_visitor_like_this_post,
+			'number_likes': response_post['number_likes']
+		})
+		# request to dislike this post again
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		self.assertEqual(response.status_code, 200)
+	
+	def test_bad_dislike_a_particular_post_when_the_visitor_already_dislike_it(self):
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		post = Post.objects.get(id=1).serialize()
+
+		# At first, the visitor doesn't like this post, then he tries to dislike it
+		does_current_visitor_like_this_post = self.doesThisUserLikeThisPost(self.mock_User1, post)
+
+		data = json.dumps({
+			'does_current_visitor_like_this_post': does_current_visitor_like_this_post,
+			'number_likes': post['number_likes']
+		})
+		# request to dislike this post
+		response = self.client.put(reverse('handleLikeDislike', kwargs={'postId': self.mock_User1.id}), data)
+
+		self.assertEqual(response.status_code, 400)
 
 
 class ProfilePage(TestCase):
