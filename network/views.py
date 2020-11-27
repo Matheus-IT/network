@@ -11,44 +11,11 @@ from django.urls import reverse
 from django.views import View
 
 from .models import User, Post, Follower, Like
+from . import utils
 
 
-def index(request):
-    from .forms import NewPostForm
-    from django.core.paginator import Paginator
-
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            newPostForm = NewPostForm(request.POST)
-
-            if newPostForm.is_valid():
-                newPostContent = newPostForm.cleaned_data['newPostContent']
-
-                newPost = Post.objects.create(
-                    poster=request.user,
-                    content=newPostContent
-                )
-                newPost.save()
-        else:
-            return HttpResponse(status=403)
-
-    allPosts = Post.objects.order_by('-timestamp').all()
-    paginator = Paginator(allPosts, 10)
-
-    return render(request, "network/index.html", {
-        'new_post_form': NewPostForm(),
-        'page_range': paginator.page_range
-    })
-
-
-def doesThisUserLikeThisPost(user, post):
-    for like in post['likes']:
-        if user.id == like['liker_id']:
-            return True
-    return False
-
-
-def getPostsPage(request, pageNumber=1, filterUserId=None):
+# ------------------------ API VIEWS ------------------------
+def getPostsPage(request, templatePageName=None, pageNumber=1, filterUserId=None):
     from django.core.paginator import Paginator, EmptyPage
 
     if filterUserId:
@@ -58,12 +25,19 @@ def getPostsPage(request, pageNumber=1, filterUserId=None):
         except ObjectDoesNotExist:
             return JsonResponse({'msg': 'This user doesn\'t exist'}, status=404)
 
-        all_posts = Post.objects.order_by('-timestamp').filter(poster=filtered_user)
+        posts = Post.objects.order_by('-timestamp').filter(poster=filtered_user)
+    elif templatePageName == 'following':
+        # filter the posts by the profiles the current user follows
+        current_user = request.user
+        # get a list of users being followed by the current user
+        followed_by_current_user = [follower.user_being_followed for follower in current_user.users_being_followed.all()]
+        # get a list of posts made by the users that the current user follow
+        posts = [post for post in Post.objects.order_by('-timestamp').all() if post.poster in followed_by_current_user]
     else:
-        all_posts = Post.objects.order_by('-timestamp').all()
+        posts = Post.objects.order_by('-timestamp').all()
 
     POSTS_PER_PAGE = 10
-    paginator = Paginator(all_posts, POSTS_PER_PAGE)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
 
     try:
         page = paginator.page(pageNumber)
@@ -73,7 +47,7 @@ def getPostsPage(request, pageNumber=1, filterUserId=None):
     current_page_posts = [post.serialize() for post in page.object_list]
     
     for post in current_page_posts:
-        post['does_current_visitor_like_this_post'] = doesThisUserLikeThisPost(request.user, post)
+        post['does_current_visitor_like_this_post'] = utils.doesThisUserLikeThisPost(request.user, post)
 
     posts_page = {
         'hasNext': page.has_next(),
@@ -112,6 +86,34 @@ def handleLikeDislike(request, postId):
             return JsonResponse(post.serialize(), status=200)
         except ObjectDoesNotExist:
             return JsonResponse({'msg': 'Error: You tried to dislike someone you don\'t like'}, status=400)
+
+# ------------------------ NORMAL VIEWS ------------------------
+def index(request):
+    from .forms import NewPostForm
+    from django.core.paginator import Paginator
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            newPostForm = NewPostForm(request.POST)
+
+            if newPostForm.is_valid():
+                newPostContent = newPostForm.cleaned_data['newPostContent']
+
+                newPost = Post.objects.create(
+                    poster=request.user,
+                    content=newPostContent
+                )
+                newPost.save()
+        else:
+            return HttpResponse(status=403)
+
+    allPosts = Post.objects.order_by('-timestamp').all()
+    paginator = Paginator(allPosts, 10)
+
+    return render(request, "network/index.html", {
+        'new_post_form': NewPostForm(),
+        'page_range': paginator.page_range
+    })
 
 
 class ProfilePage(View):
@@ -213,7 +215,7 @@ def followingPage(request):
     followed_by_current_user = [follower.user_being_followed for follower in current_user.users_being_followed.all()]
     # get a list of posts made by the users that the current user follow
     posts_from_users_followed = [post for post in Post.objects.order_by('-timestamp').all() if post.poster in followed_by_current_user]
-
+    print(posts_from_users_followed)
     paginator = Paginator(posts_from_users_followed, 10)
 
     return render(request, 'network/followingPage.html', {
@@ -272,3 +274,5 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
