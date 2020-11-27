@@ -205,6 +205,8 @@ class ProfilePage(View):
 
 @login_required
 def followingPage(request):
+    from django.core.paginator import Paginator
+    
     current_user = request.user
 
     # get a list of users being followed by the current user
@@ -212,8 +214,11 @@ def followingPage(request):
     # get a list of posts made by the users that the current user follow
     posts_from_users_followed = [post for post in Post.objects.order_by('-timestamp').all() if post.poster in followed_by_current_user]
 
+    paginator = Paginator(posts_from_users_followed, 10)
+
     return render(request, 'network/followingPage.html', {
-        'posts_from_users_followed': posts_from_users_followed
+        'posts_from_users_followed': posts_from_users_followed,
+        'page_range': paginator.page_range
     })
 
 
