@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     # ------------------------ API URLS ------------------------
+    path('getPostsProfilePage/<int:filterUserId>/<int:pageNumber>', views.getPostsPage, name='getPostsPageGivenUserId'),
     path('getPostsPage/<str:templatePageName>/<int:pageNumber>', views.getPostsPage, name='getPostsPageGivenTemplate'),
-    path('getPostsPage/<int:pageNumber>/<int:filterUserId>', views.getPostsPage, name='getPostsPageGivenUserId'),
 
     path('handleLikeDislike/<int:postId>', views.handleLikeDislike, name='handleLikeDislike'),
 

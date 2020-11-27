@@ -3,11 +3,11 @@ function fetchPostsPage(pageNumber) {
 	let fetchPromise;
 
 	try {
-		// fetch posts for profilePage, global variable 'profileId' from django
-		fetchPromise = fetch(`/getPostsPage/${pageNumber}/${profileId}`);
+		// fetch posts for profile page, global variable 'profileId' from django
+		fetchPromise = fetch(`/getPostsProfilePage/${profileId}/${pageNumber}`);
 	} catch(err) {
 		if (err.name === 'ReferenceError') {
-			// If the 'profileId wasn't defined it means we're on another page given a name
+			// If the 'profileId' wasn't defined it means we're on another page, given a template page name
 			fetchPromise = fetch(`/getPostsPage/${templatePageName}/${pageNumber}`);
 		} else {
 			console.log(err);

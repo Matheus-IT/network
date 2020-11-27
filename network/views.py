@@ -215,7 +215,7 @@ def followingPage(request):
     followed_by_current_user = [follower.user_being_followed for follower in current_user.users_being_followed.all()]
     # get a list of posts made by the users that the current user follow
     posts_from_users_followed = [post for post in Post.objects.order_by('-timestamp').all() if post.poster in followed_by_current_user]
-    print(posts_from_users_followed)
+
     paginator = Paginator(posts_from_users_followed, 10)
 
     return render(request, 'network/followingPage.html', {

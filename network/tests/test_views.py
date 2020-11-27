@@ -123,6 +123,8 @@ class GetPostsPage(TestCase):
 
 		self.assertEqual(response.status_code, 404)
 	
+	
+	
 	def test_get_first_posts_page_from_a_profile(self):
 		# mock_user2 requests some posts from mock_user1
 		self.client.login(
