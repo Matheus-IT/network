@@ -1,16 +1,16 @@
-
 from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    path("", views.index, name="index"),
-
-    path('getPostsPage/', views.getPostsPage, name='getPostsPage'),
-    path('getPostsPage/<int:pageNumber>', views.getPostsPage, name='getPostsPage'),
-    path('getPostsPage/<int:pageNumber>/<int:filterUserId>', views.getPostsPage, name='getPostsPage'),
+    # ------------------------ API URLS ------------------------
+    path('getPostsPage/<str:templatePageName>/<int:pageNumber>', views.getPostsPage, name='getPostsPageGivenTemplate'),
+    path('getPostsPage/<int:pageNumber>/<int:filterUserId>', views.getPostsPage, name='getPostsPageGivenUserId'),
 
     path('handleLikeDislike/<int:postId>', views.handleLikeDislike, name='handleLikeDislike'),
+
+    # ------------------------ NORMAL URLS ------------------------
+    path("", views.index, name="index"),
 
     path("profile/<int:profileId>", views.ProfilePage.as_view(), name="profilePage"),
     path('following/', views.followingPage, name='followingPage'),
