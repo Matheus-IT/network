@@ -1,7 +1,20 @@
 /* JAVASCRIPT RELATED TO POSTS STUFF */
 function fetchPostsPage(pageNumber=1) {
-	// using global variable 'profileId' from django
-	fetch(`/getPostsPage/${pageNumber}/${profileId}`)
+	let fetchPromise;
+
+	try {
+		// using global variable 'profileId' from django
+		fetchPromise = fetch(`/getPostsPage/${pageNumber}/${profileId}`);
+	} catch(err) {
+		if (err.name === 'ReferenceError') {
+			// If the 'profileId wasn't defined it means we're on Index Page, so we don't use it
+			fetchPromise = fetch(`/getPostsPage/${pageNumber}`)
+		} else {
+			console.log(err);
+		}
+	}
+
+	fetchPromise
 	.then(response => response.json())
 	.then(postsPage => {
 		generatePosts(postsPage.currentPagePosts);
