@@ -10,7 +10,8 @@
 	<script src="{% static 'network/JS/relatedToPosts.js' %}" type="text/javascript"></script>
     <script type="text/javascript">
         /* GLOBAL VARIABLES */
-		var currentNavigationPage;
+        var currentNavigationPage;
+        const templatePageName = 'index';
 		
 		/* GLOBAL VARIABLES FROM DJANGO */
 		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
