@@ -55,8 +55,16 @@ function generatePosts(currentPagePostsData) {
 
 		post.innerHTML += `
 			<strong class="numLikes">${postData.number_likes}</strong>
-			<br>
 		`;
+
+		if (isUserAuthenticated) {
+			const editIcon = document.createElement('img');
+
+			editIcon.setAttribute('class', 'editIcon');
+			editIcon.setAttribute('id', `editIcon${postData.id}`);
+			editIcon.setAttribute('src', editIconSource);
+			post.append(editIcon);
+		}
 
 		postsContainer.append(post);
 	});
