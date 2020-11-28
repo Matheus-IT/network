@@ -94,7 +94,19 @@ class GetPostsPage(TestCase):
 			if post['poster']['id'] != user.id:
 				return False
 		return True
-		
+
+	def areAllThesePostsFromProfilesTheCurrentUserFollows(self, posts, user):
+		follow_objects = user.users_being_followed.all()
+		# get a list of users ids that the given user follows
+		users_followed_ids = [follow.user_being_followed.id for follow in follow_objects]
+
+		for post in posts:
+			if post['poster']['id'] in users_followed_ids:
+				continue
+			else:
+				return False
+		return True
+
 	def test_get_posts_from_index_first_page(self):
 		self.client.login(
 			username=self.mock_user1['username'],
@@ -123,7 +135,33 @@ class GetPostsPage(TestCase):
 
 		self.assertEqual(response.status_code, 404)
 	
-	
+	def test_get_posts_for_first_page_of_page_following(self):
+		self.client.login(
+			username=self.mock_user1['username'],
+			password=self.mock_user1['password']
+		)
+
+		follow = Follower.objects.create(
+			user_follower = self.mock_User1,
+			user_being_followed = self.mock_User2 
+		)
+
+		response = self.client.get(reverse('getPostsPageGivenTemplate', kwargs={
+			'templatePageName': 'following',
+			'pageNumber': 1
+		}))
+
+		# get a list of users being followed by the current user
+		follow_objects = self.mock_User1.users_being_followed.all()
+		followed_by_current_user = [follow.user_being_followed for follow in follow_objects]
+		
+		# get a list of posts made by the users that the current user follows
+		serialized_posts = [post.serialize() for post in Post.objects.order_by('-timestamp').all()[:10] if post.poster in followed_by_current_user]
+
+		result = self.areAllThesePostsFromProfilesTheCurrentUserFollows(serialized_posts, self.mock_User1)
+
+		self.assertTrue(result)
+		self.assertEqual(response.status_code, 200)
 	
 	def test_get_first_posts_page_from_a_profile(self):
 		# mock_user2 requests some posts from mock_user1
