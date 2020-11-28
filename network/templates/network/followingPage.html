@@ -1,22 +1,49 @@
 {% extends './layout.html' %}
 
-{% block body %}
+{% load static %}
 
+{% block otherStatics %}
+    <script src="{% static 'network/JS/utilityFunctions.js' %}" type="text/javascript"></script>
+    <script src="{% static 'network/JS/relatedToPagination.js' %}" type="text/javascript"></script>
+    <script src="{% static 'network/JS/relatedToPosts.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+        /* GLOBAL VARIABLES */
+        var currentNavigationPage;
+        const templatePageName = 'following';
+
+        /* GLOBAL VARIABLES FROM DJANGO */
+        const isUserAuthenticated = true; // the following page is just for authenticated users
+
+        const solidHeartIconSource = '{% static "network/icons/heart-solid.png" %}';
+        const openHeartIconSource = '{% static "network/icons/heart-regular.png" %}';
+    </script>
+{% endblock %}
+
+{% block body %}
 	<div class="postsContainer">
 		<h2>Posts from the users you follow</h2>
         <h4>Latest posts:</h4>
 
-        {% for post in posts_from_users_followed %}
-            <div class="post">
-                <h3>
-                    <a href="{% url 'profilePage' post.poster.id %}">{{ post.poster }}</a> says
-                </h3>
-                <p>{{ post.content }}</p>
-                <em>{{ post.timestamp }}</em>
-                <br>
-                <strong>Likes {{ post.likes }}</strong>
-                <br>
-            </div>
-        {% endfor %}
+        <div id="postsWrapper">
+            <!-- Posts from AJAX will be generated here -->
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <li class="page-item">
+                  <button id="previousPage" class="page-link">Previous</button>
+              </li>
+              
+              {% for i in page_range %}
+                  <li class="page-item">
+                      <button class="page-link page-number">{{ forloop.counter }}</button>
+                  </li>
+              {% endfor %}
+              
+              <li class="page-item">
+                  <button id="nextPage" class="page-link">Next</button>
+              </li>
+            </ul>
+          </nav>
     </div>
 {% endblock %}
