@@ -40,6 +40,20 @@ function navigateTo(pageNumber) {
 	// fetchPostsPage is from 'relatedToPosts.js'
 	fetchPostsPage(pageNumber);
 	currentNavigationPage = pageNumber;
+	goToTheTop();
+}
+
+async function goToTheTop() {
+	// document.body.scrollTop // For Safari
+	// document.documentElement.scrollTop // For Chrome, Firefox, IE and Opera
+	while (document.body.scrollTop != 0 || document.documentElement.scrollTop != 0) {
+		await sleep(1);
+		window.scrollBy(0, -100);
+	}
+}
+
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function deactivateAllFromPagination(className) {
