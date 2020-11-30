@@ -10,9 +10,10 @@
         /* GLOBAL VARIABLES */
         var currentNavigationPage;
         const templatePageName = 'following';
+        const isUserAuthenticated = true; // the following page is just for authenticated users
 
         /* GLOBAL VARIABLES FROM DJANGO */
-        const isUserAuthenticated = true; // the following page is just for authenticated users
+        const userUsername = '{{ user.username }}';
     </script>
 {% endblock %}
 

@@ -73,7 +73,7 @@ function generatePosts(currentPagePostsData) {
 			<strong class="numLikes">${postData.number_likes}</strong>
 		`;
 
-		if (isUserAuthenticated) {
+		if (isUserAuthenticated && isUserThePoster(postData.poster)) {
 			const editIcon = generateIcon('editIcon', postData.id);
 
 			// global icon source variable
@@ -200,4 +200,8 @@ function handleCancelEditPost(postContent, post, editIcon) {
 	editIcon.style.display = 'block';
 	post.querySelector('.actionsContainer').innerHTML = '';
 	post.querySelector('.actionsContainer').append(editIcon);
+}
+
+function isUserThePoster(poster) {
+	return poster.username === userUsername;
 }

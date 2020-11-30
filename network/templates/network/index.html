@@ -14,7 +14,8 @@
         const templatePageName = 'index';
 		
 		/* GLOBAL VARIABLES FROM DJANGO */
-		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+        const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+        const userUsername = '{{ user.username }}';
     </script>
 {% endblock%}
 

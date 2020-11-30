@@ -17,6 +17,7 @@
 		
 		/* GLOBAL VARIABLES FROM DJANGO */
 		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+		const userUsername = '{{ user.username }}';
 		const profileId = Number.parseInt('{{ profile_id }}');
 		
 		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
