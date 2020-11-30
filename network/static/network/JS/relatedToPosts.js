@@ -78,7 +78,7 @@ function generatePosts(currentPagePostsData) {
 
 			// global icon source variable
 			editIcon.setAttribute('src', editIconSource);
-			editIcon.addEventListener('click', () => handleEditPost(post, postData));
+			editIcon.addEventListener('click', () => handleEditPost(postData));
 			post.querySelector('.actionsContainer').append(editIcon);
 		}
 
@@ -149,7 +149,6 @@ function handleLikeDislike(postData) {
 	.then(response => response.json())
 	.then(data => {
 		const post = document.querySelector(`#post${data.id}`);
-
 		post.querySelector('.numLikes').innerHTML = data.number_likes;
 
 		const likeIcon = post.querySelector(`#likeIcon${data.id}`);
@@ -164,9 +163,11 @@ function handleLikeDislike(postData) {
 	.catch(err => console.log(err));
 }
 
-function handleEditPost(post, postData) {
+function handleEditPost(postData) {
+	const post = document.querySelector(`#post${postData.id}`);
 	const postContentContainer = post.querySelector(`.contentContainer`);
 	const postContent = postContentContainer.querySelector('p').innerHTML;
+	
 	const editIcon = post.querySelector(`#editIcon${postData.id}`);
 	editIcon.style.display = 'none';
 	
@@ -184,18 +185,17 @@ function handleEditPost(post, postData) {
 	const saveIcon = generateIcon('saveIcon', postData.id);
 	// global icon source variable
 	saveIcon.setAttribute('src', saveIconSource);
-	saveIcon.addEventListener('click', () => handleSaveNewPostContent(post, postData));
+	saveIcon.addEventListener('click', () => handleSaveNewPostContent(postData));
 	actionsContainer.append(saveIcon);
 
 	const cancelIcon = generateIcon('cancelIcon', postData.id);
 	cancelIcon.setAttribute('src', cancelIconSource);
-	cancelIcon.addEventListener('click', () => handleCancelEditPost(postContent, post, editIcon));
+	cancelIcon.addEventListener('click', () => handleCancelEditPost(postData, editIcon));
 	actionsContainer.append(cancelIcon);
-
-	console.log(postContent + ' editing...');
 }
 
-function handleSaveNewPostContent(post, postData) {
+function handleSaveNewPostContent(postData) {
+	const post = document.querySelector(`#post${postData.id}`);
 	const newContent = post.querySelector(`#editArea${postData.id}`).value;
 
 	fetch(`/handleSaveNewPostContent/${postData.id}`, {
@@ -224,8 +224,12 @@ function handleSaveNewPostContent(post, postData) {
 	.catch(err => console.log(err));
 }
 
-function handleCancelEditPost(postContent, post, editIcon) {
-	post.querySelector('.contentContainer').innerHTML = `<p>${postContent}</p>`;
+function handleCancelEditPost(postData, editIcon) {
+	const post = document.querySelector(`#post${postData.id}`);
+	const contentContainer = post.querySelector('.contentContainer');
+	const postContent = contentContainer.querySelector(`#editArea${postData.id}`).innerHTML;
+	
+	contentContainer.innerHTML = `<p>${postContent}</p>`;
 
 	editIcon.style.display = 'block';
 	post.querySelector('.actionsContainer').innerHTML = '';
