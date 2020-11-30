@@ -38,14 +38,30 @@ function generatePosts(currentPagePostsData) {
 			<h3>
 				<a href="/profile/${postData.poster.id}">${postData.poster.username}</a> says
 			</h3>
-			<p>${postData.content}</p>
+			<div class="contentContainer">
+				<p>${postData.content}</p>
+			</div>
 			<em>${postData.timestamp}</em>
 			<br>
+			<div class="icons">
+				<div class="likeContainer">
+				</div>
+
+				<div class="actionsContainer">
+				</div>
+			</div>
 		`;
 		
 		if (isUserAuthenticated) {
-			const likeIcon = generateLikeIcon(postData);
-			post.append(likeIcon);
+			const likeIcon = generateIcon('likeIcon', postData.id);
+			
+			if (postData.does_current_visitor_like_this_post) {
+				// global icon source variables
+				likeIcon.setAttribute('src', solidHeartIconSource);
+			} else {
+				likeIcon.setAttribute('src', openHeartIconSource);
+			}
+			post.querySelector('.likeContainer').append(likeIcon);
 
 			// add the event handler when the like icon is available
 			observeElementResolveWhenAvailable(`#likeIcon${postData.id}`)
@@ -53,17 +69,17 @@ function generatePosts(currentPagePostsData) {
 			.catch(err => console.log(err));
 		}
 
-		post.innerHTML += `
+		post.querySelector('.likeContainer').innerHTML += `
 			<strong class="numLikes">${postData.number_likes}</strong>
 		`;
 
 		if (isUserAuthenticated) {
-			const editIcon = document.createElement('img');
+			const editIcon = generateIcon('editIcon', postData.id);
 
-			editIcon.setAttribute('class', 'editIcon');
-			editIcon.setAttribute('id', `editIcon${postData.id}`);
+			// global icon source variable
 			editIcon.setAttribute('src', editIconSource);
-			post.append(editIcon);
+			editIcon.addEventListener('click', () => handleEditPost(post, postData));
+			post.querySelector('.actionsContainer').append(editIcon);
 		}
 
 		postsContainer.append(post);
@@ -79,20 +95,13 @@ function handleHideShowNavigationButton(hasThisPage, navigationButtonId) {
 		navigationButton.style.display = 'none'
 }
 
-function generateLikeIcon(postData) {
-	let likeIcon = document.createElement('img');
+function generateIcon(name, identifier) {
+	/* returns an icon given a name and a identifier */
+	let icon = document.createElement('img');
 
-	likeIcon.setAttribute('class', 'likeIcon');
-	likeIcon.setAttribute('id', `likeIcon${postData.id}`);
-	
-	if (postData.does_current_visitor_like_this_post) {
-		// global icon variables
-		likeIcon.setAttribute('src', solidHeartIconSource);
-	} else {
-		likeIcon.setAttribute('src', openHeartIconSource);
-	}
-	
-	return likeIcon;
+	icon.setAttribute('class', `${name}`);
+	icon.setAttribute('id', `${name}${identifier}`);
+	return icon;
 }
 
 function observeElementResolveWhenAvailable(selector) {
@@ -153,4 +162,42 @@ function handleLikeDislike(postData) {
 		}
 	})
 	.catch(err => console.log(err));
+}
+
+function handleEditPost(post, postData) {
+	const postContentContainer = post.querySelector(`.contentContainer`);
+	const postContent = postContentContainer.querySelector('p').innerHTML;
+	const editIcon = post.querySelector(`#editIcon${postData.id}`);
+	editIcon.style.display = 'none';
+	
+	const editArea = document.createElement('textarea');
+	editArea.setAttribute('rows', '5');
+	editArea.setAttribute('columns', '15');
+	editArea.innerHTML = postContent;
+	
+	postContentContainer.innerHTML = '';
+	postContentContainer.append(editArea);
+	
+	const actionsContainer = post.querySelector('.actionsContainer');
+
+	const saveIcon = generateIcon('saveIcon', postData.id);
+	// global icon source variable
+	saveIcon.setAttribute('src', saveIconSource);
+	saveIcon.addEventListener('click', () => console.log('save!'));
+	actionsContainer.append(saveIcon);
+
+	const cancelIcon = generateIcon('cancelIcon', postData.id);
+	cancelIcon.setAttribute('src', cancelIconSource);
+	cancelIcon.addEventListener('click', () => handleCancelEditPost(postContent, post, editIcon));
+	actionsContainer.append(cancelIcon);
+
+	console.log(postContent + ' editing...');
+}
+
+function handleCancelEditPost(postContent, post, editIcon) {
+	post.querySelector('.contentContainer').innerHTML = `<p>${postContent}</p>`;
+
+	editIcon.style.display = 'block';
+	post.querySelector('.actionsContainer').innerHTML = '';
+	post.querySelector('.actionsContainer').append(editIcon);
 }
