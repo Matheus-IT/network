@@ -41,7 +41,7 @@ function generatePosts(currentPagePostsData) {
 			<div class="contentContainer">
 				<p>${postData.content}</p>
 			</div>
-			<em>${postData.timestamp}</em>
+			<em class="timestamp">${postData.timestamp}</em>
 			<br>
 			<div class="icons">
 				<div class="likeContainer">
@@ -171,6 +171,7 @@ function handleEditPost(post, postData) {
 	editIcon.style.display = 'none';
 	
 	const editArea = document.createElement('textarea');
+	editArea.setAttribute('id', `editArea${postData.id}`);
 	editArea.setAttribute('rows', '5');
 	editArea.setAttribute('columns', '15');
 	editArea.innerHTML = postContent;
@@ -183,7 +184,7 @@ function handleEditPost(post, postData) {
 	const saveIcon = generateIcon('saveIcon', postData.id);
 	// global icon source variable
 	saveIcon.setAttribute('src', saveIconSource);
-	saveIcon.addEventListener('click', () => console.log('save!'));
+	saveIcon.addEventListener('click', () => handleSaveNewPostContent(post, postData));
 	actionsContainer.append(saveIcon);
 
 	const cancelIcon = generateIcon('cancelIcon', postData.id);
@@ -192,6 +193,35 @@ function handleEditPost(post, postData) {
 	actionsContainer.append(cancelIcon);
 
 	console.log(postContent + ' editing...');
+}
+
+function handleSaveNewPostContent(post, postData) {
+	const newContent = post.querySelector(`#editArea${postData.id}`).value;
+
+	fetch(`/handleSaveNewPostContent/${postData.id}`, {
+		method: 'PUT',
+		body: JSON.stringify({
+			newContent: newContent
+		}),
+		headers: {
+			// getCookie from utility functions
+			'X-CSRFToken': getCookie('csrftoken')
+		}
+	})
+	.then(response => response.json())
+	.then(data => {
+		console.log(data);
+
+		post.querySelector('.contentContainer').innerHTML = `<p>${newContent}</p>`;
+
+		post.querySelector('.timestamp').innerHTML = data.timestamp;
+
+		const editIcon = post.querySelector(`#editIcon${postData.id}`);
+		editIcon.style.display = 'block';
+		post.querySelector('.actionsContainer').innerHTML = '';
+		post.querySelector('.actionsContainer').append(editIcon);
+	})
+	.catch(err => console.log(err));
 }
 
 function handleCancelEditPost(postContent, post, editIcon) {
