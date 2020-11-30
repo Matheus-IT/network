@@ -9,5 +9,20 @@
 
 		border-radius: 0.4em;
 		border: 0.075em solid $gray;
+
+		textarea {
+			padding: 0.8em;
+			border-radius: 0.4em;
+			width: 100%;
+		}
+
+		.icons {
+			display: flex;
+			align-items: center;
+			
+			.actionsContainer {
+				margin-left: 1em;
+			}
+		}
 	}
 }

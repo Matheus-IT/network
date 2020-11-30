@@ -59,5 +59,17 @@ html {
   border-radius: 0.4em;
   border: 0.075em solid #afafaf;
 }
+.postsContainer .post textarea {
+  padding: 0.8em;
+  border-radius: 0.4em;
+  width: 100%;
+}
+.postsContainer .post .icons {
+  display: flex;
+  align-items: center;
+}
+.postsContainer .post .icons .actionsContainer {
+  margin-left: 1em;
+}
 
 /*# sourceMappingURL=styles.css.map */
