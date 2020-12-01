@@ -6,7 +6,8 @@ class NewPostForm(forms.Form):
             'id': 'newPost',
             'class': 'form-control',
             'cols': 20,
-            'rows': 4
+            'rows': 4,
+            'placeholder': 'New post'
         }),
-        label='New Post'
+        label=''
     )

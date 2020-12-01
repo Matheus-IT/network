@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
 	const newPost = document.querySelector('#newPost');
-	const newPostLabel = document.querySelector('.newPostArea label');
 	const postButton = document.querySelector('#submitNewPost');
 
+	const borderRadiusBefore = newPost.style.borderRadius;
+
 	newPost.addEventListener('focus', function() {
-		newPostLabel.style.display = 'none';
 		postButton.style.alignSelf = 'flex-end';
+		newPost.style.borderRadius = '0.4em';
 	});
 
 	newPost.addEventListener('focusout', function() {
 		postButton.style.alignSelf = 'center';
-		newPostLabel.style.display = 'block';
+		newPost.style.borderRadius = borderRadiusBefore;
 	});
 });

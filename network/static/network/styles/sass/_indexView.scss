@@ -1,33 +1,36 @@
-.newPostArea {
+.newPostForm {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
 
-	width: 40%;
+	width: 100%;
 	min-height: 55px;
-	margin: auto;
 	margin-bottom: 1.6em;
-	padding: 1em;
+	padding: 0.6em;
 
-	border-radius: 0.4em;
-	border: 0.075em solid $gray;
-
-	label {
-		margin: 0;
-		min-width: 4.6em;
-		transition: all 250ms $flutteredAnimation;
-	}
+	background-color: $light_gray;
 
 	#newPost {
-		margin: 0 0.6em;
-		width: 85%;
-		height: 2.1875em;
+		margin-right: 0.6em;
+		width: 30em;
+		height: 2.5em;
 		resize: none;
 
-		transition: height 250ms $flutteredAnimation;
+		border-radius: 3.125em;
+		border: 0.075em solid $gray;
+
+		transition: all 250ms $flutteredAnimation;
 	
 		&:focus {
 			height: 9.375em;
+			width: 34em;
 		}
+	}
+
+	#submitNewPost {
+		width: 4.5em;
+		border-radius: 3.125em;
+
+		transition: all 250ms ease-in-out;
 	}
 }
