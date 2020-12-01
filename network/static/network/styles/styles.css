@@ -91,6 +91,7 @@ html {
   position: absolute;
 }
 .postsContainer .post .icons .likeContainer .likeIcon {
+  margin-right: 0.4em;
   width: 2.5em;
 }
 .postsContainer .post .icons .actionsContainer {

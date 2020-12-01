@@ -60,17 +60,26 @@ function generatePosts(currentPagePostsData) {
 			} else {
 				likeIcon.setAttribute('src', openHeartIconSource);
 			}
-			post.querySelector('.likeContainer').append(likeIcon);
+
+			const likeContainer = post.querySelector('.likeContainer');
+			likeContainer.append(likeIcon);
+			
+			const numLikes = document.createElement('strong');
+			numLikes.setAttribute('class', 'numLikes');
+			numLikes.innerHTML = postData.number_likes;
+
+			likeContainer.append(numLikes);
 
 			// add the event handler when the like icon is available
 			observeElementResolveWhenAvailable(`#likeIcon${postData.id}`)
 			.then(likeIcon => likeIcon.onclick = () => handleLikeDislike(postData))
 			.catch(err => console.log(err));
+		} else {
+			post.querySelector('.likeContainer').innerHTML += `
+				Likes <strong class="numLikes">${postData.number_likes}</strong>
+			`;
 		}
 
-		post.querySelector('.likeContainer').innerHTML += `
-			<strong class="numLikes">${postData.number_likes}</strong>
-		`;
 
 		if (isUserAuthenticated && isUserThePoster(postData.poster)) {
 			const editIcon = generateIcon('editIcon', postData.id);
