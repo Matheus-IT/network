@@ -17,13 +17,11 @@
 		
 		/* GLOBAL VARIABLES FROM DJANGO */
 		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+		const userUsername = '{{ user.username }}';
 		const profileId = Number.parseInt('{{ profile_id }}');
 		
 		var visitorIsFollowing = convertPythonBooleanToJsBoolean('{{ visitor_is_following }}');
 		var numOfFollowers = Number.parseInt('{{ n_of_followers }}');
-
-		const solidHeartIconSource = '{% static "network/icons/heart-solid.png" %}';
-		const openHeartIconSource = '{% static "network/icons/heart-regular.png" %}';
 	</script>
 {% endblock %}
 

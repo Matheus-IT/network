@@ -8,6 +8,7 @@ urlpatterns = [
     path('getPostsPage/<str:templatePageName>/<int:pageNumber>', views.getPostsPage, name='getPostsPageGivenTemplate'),
 
     path('handleLikeDislike/<int:postId>', views.handleLikeDislike, name='handleLikeDislike'),
+    path('handleSaveNewPostContent/<int:postId>', views.handleSaveNewPostContent, name='handleSaveNewPostContent'),
 
     # ------------------------ NORMAL URLS ------------------------
     path("", views.index, name="index"),

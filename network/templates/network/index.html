@@ -14,21 +14,19 @@
         const templatePageName = 'index';
 		
 		/* GLOBAL VARIABLES FROM DJANGO */
-		const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
-
-		const solidHeartIconSource = '{% static "network/icons/heart-solid.png" %}';
-        const openHeartIconSource = '{% static "network/icons/heart-regular.png" %}';
+        const isUserAuthenticated = convertPythonBooleanToJsBoolean('{{ user.is_authenticated }}');
+        const userUsername = '{{ user.username }}';
     </script>
 {% endblock%}
 
 {% block body %}
     {% if user.is_authenticated %}
-        <form action="{% url 'index' %}" method="POST" class="newPostArea">
+        <form action="{% url 'index' %}" method="POST" class="newPostForm">
             {% csrf_token %}
 
             {{ new_post_form }}
 
-            <button id="submitNewPost" class="btn btn-primary" button>Post</button>
+            <button id="submitNewPost" class="btn btn-primary">Post</button>
         </form>
     {% endif %}
 

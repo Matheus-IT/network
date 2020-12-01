@@ -8,32 +8,33 @@ html {
   box-sizing: border-box;
 }
 
-.newPostArea {
+.newPostForm {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  width: 40%;
+  width: 100%;
   min-height: 55px;
-  margin: auto;
   margin-bottom: 1.6em;
-  padding: 1em;
-  border-radius: 0.4em;
-  border: 0.075em solid #afafaf;
+  padding: 0.6em;
+  background-color: #d1d1d1;
 }
-.newPostArea label {
-  margin: 0;
-  min-width: 4.6em;
+.newPostForm #newPost {
+  margin-right: 0.6em;
+  width: 30em;
+  height: 2.5em;
+  resize: none;
+  border-radius: 3.125em;
+  border: 0.075em solid #afafaf;
   transition: all 250ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
-.newPostArea #newPost {
-  margin: 0 0.6em;
-  width: 85%;
-  height: 2.1875em;
-  resize: none;
-  transition: height 250ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-.newPostArea #newPost:focus {
+.newPostForm #newPost:focus {
   height: 9.375em;
+  width: 34em;
+}
+.newPostForm #submitNewPost {
+  width: 4.5em;
+  border-radius: 3.125em;
+  transition: all 250ms ease-in-out;
 }
 
 .profileContainer {
@@ -58,6 +59,50 @@ html {
   padding: 1em;
   border-radius: 0.4em;
   border: 0.075em solid #afafaf;
+}
+.postsContainer .post textarea {
+  padding: 0.8em;
+  border-radius: 0.4em;
+  width: 100%;
+}
+.postsContainer .post .contentContainer {
+  font-size: 1.4em;
+}
+.postsContainer .post .timestamp {
+  font-style: italic;
+  font-size: 0.6em;
+}
+.postsContainer .post .icons {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 1.4em;
+  margin-bottom: 0.6em;
+  padding: 0.6em 0;
+}
+.postsContainer .post .icons img {
+  cursor: pointer;
+  transition: margin 250ms ease-in-out;
+}
+.postsContainer .post .icons img:hover {
+  margin-top: -0.5em;
+}
+.postsContainer .post .icons .likeContainer {
+  position: absolute;
+}
+.postsContainer .post .icons .likeContainer .likeIcon {
+  margin-right: 0.4em;
+  width: 2.5em;
+}
+.postsContainer .post .icons .actionsContainer {
+  position: absolute;
+  margin-left: 4em;
+}
+.postsContainer .post .icons .actionsContainer .saveIcon, .postsContainer .post .icons .actionsContainer .cancelIcon {
+  width: 3em;
+}
+.postsContainer .post .icons .actionsContainer .editIcon {
+  width: 2.5em;
 }
 
 /*# sourceMappingURL=styles.css.map */

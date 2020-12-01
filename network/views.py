@@ -87,6 +87,32 @@ def handleLikeDislike(request, postId):
         except ObjectDoesNotExist:
             return JsonResponse({'msg': 'Error: You tried to dislike someone you don\'t like'}, status=400)
 
+
+def handleSaveNewPostContent(request, postId):
+    import json
+
+    try:
+        post = Post.objects.get(id=postId)
+    except ObjectDoesNotExist:
+        return JsonResponse({'msg': 'No post found with this id'}, status=404)
+    
+    if request.user.username != post.poster.username:
+        return JsonResponse({'msg': 'This user is not allowed to change this post'}, status=302)
+    
+    data = json.loads(request.body)
+    
+    if data['newContent']:
+        try:
+            post.content = data['newContent']
+            post.save()
+            return JsonResponse(post.serialize(), status=200)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'msg': 'Something went wrong...'}, status=500)
+    else:
+        return JsonResponse({'msg': 'The new content is blank'}, status=400)
+
+
 # ------------------------ NORMAL VIEWS ------------------------
 def index(request):
     from .forms import NewPostForm

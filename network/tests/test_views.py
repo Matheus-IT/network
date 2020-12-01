@@ -350,6 +350,65 @@ class HandleLikeDislike(TestCase):
 		self.assertEqual(response.status_code, 400)
 
 
+class HandleSaveNewPostContent(TestCase):
+	def setUp(self):
+		self.mock_user = {
+			'username': 'test_user',
+			'password': '12345',
+			'email': 'test_user@example.com'
+		}
+
+		self.mock_User = self.createUser(self.mock_user)
+
+		self.test_post = Post.objects.create(poster=self.mock_User, content='test post content')
+
+	def createUser(self, user):
+		return User.objects.create_user(
+			username=user['username'],
+			password=user['password'],
+			email=user['email']
+		)
+	
+	def test_save_new_post_content(self):
+		self.client.login(
+			username = self.mock_user['username'],
+			password = self.mock_user['password']
+		)
+
+		data = json.dumps({'newContent': 'new content for tests'})
+		response = self.client.put(reverse('handleSaveNewPostContent', kwargs={'postId': self.test_post.id}), data)
+		self.assertEqual(response.status_code, 200)
+	
+	def test_bad_save_new_post_content_when_wrong_post_id(self):
+		""" This case should fail because the post id doesn't exist """
+		self.client.login(
+			username = self.mock_user['username'],
+			password = self.mock_user['password']
+		)
+
+		data = json.dumps({'newContent': 'new content for tests'})
+		response = self.client.put(reverse('handleSaveNewPostContent', kwargs={'postId': 5}), data)
+		self.assertEqual(response.status_code, 404)
+	
+	def test_bad_save_new_post_content_when_blank_new_content(self):
+		""" This case should fail because it's trying to send a new content blank """
+		self.client.login(
+			username = self.mock_user['username'],
+			password = self.mock_user['password']
+		)
+
+		data = json.dumps({'newContent': ''})
+		response = self.client.put(reverse('handleSaveNewPostContent', kwargs={'postId': self.test_post.id}), data)
+		self.assertEqual(response.status_code, 400)
+	
+	def test_bad_save_new_post_content_when_unauthorized_user(self):
+		""" This case should fail because the user is not authenticated """
+
+		data = json.dumps({'newContent': 'new content for tests'})
+		response = self.client.put(reverse('handleSaveNewPostContent', kwargs={'postId': self.test_post.id}), data)
+		self.assertEqual(response.status_code, 302)
+
+
 class ProfilePage(TestCase):
 	def setUp(self):
 		self.client = Client()

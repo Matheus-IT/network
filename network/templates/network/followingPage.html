@@ -10,12 +10,10 @@
         /* GLOBAL VARIABLES */
         var currentNavigationPage;
         const templatePageName = 'following';
-
-        /* GLOBAL VARIABLES FROM DJANGO */
         const isUserAuthenticated = true; // the following page is just for authenticated users
 
-        const solidHeartIconSource = '{% static "network/icons/heart-solid.png" %}';
-        const openHeartIconSource = '{% static "network/icons/heart-regular.png" %}';
+        /* GLOBAL VARIABLES FROM DJANGO */
+        const userUsername = '{{ user.username }}';
     </script>
 {% endblock %}
 
