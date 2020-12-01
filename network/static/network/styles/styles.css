@@ -65,12 +65,43 @@ html {
   border-radius: 0.4em;
   width: 100%;
 }
+.postsContainer .post .contentContainer {
+  font-size: 1.4em;
+}
+.postsContainer .post .timestamp {
+  font-style: italic;
+  font-size: 0.6em;
+}
 .postsContainer .post .icons {
+  position: relative;
   display: flex;
   align-items: center;
+  margin-top: 1.4em;
+  margin-bottom: 0.6em;
+  padding: 0.6em 0;
+}
+.postsContainer .post .icons img {
+  cursor: pointer;
+  transition: margin 250ms ease-in-out;
+}
+.postsContainer .post .icons img:hover {
+  margin-top: -0.5em;
+}
+.postsContainer .post .icons .likeContainer {
+  position: absolute;
+}
+.postsContainer .post .icons .likeContainer .likeIcon {
+  width: 2.5em;
 }
 .postsContainer .post .icons .actionsContainer {
-  margin-left: 1em;
+  position: absolute;
+  margin-left: 4em;
+}
+.postsContainer .post .icons .actionsContainer .saveIcon, .postsContainer .post .icons .actionsContainer .cancelIcon {
+  width: 3em;
+}
+.postsContainer .post .icons .actionsContainer .editIcon {
+  width: 2.5em;
 }
 
 /*# sourceMappingURL=styles.css.map */

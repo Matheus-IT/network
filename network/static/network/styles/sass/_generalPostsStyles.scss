@@ -16,12 +16,50 @@
 			width: 100%;
 		}
 
+		.contentContainer {
+			font-size: 1.4em;
+		}
+
+		.timestamp {
+			font-style: italic;
+			font-size: 0.6em;
+		}
+
 		.icons {
+			position: relative;
 			display: flex;
 			align-items: center;
+			margin-top: 1.4em;
+			margin-bottom: 0.6em;
+			padding: 0.6em 0;
+
+			img {
+				cursor: pointer;
+				transition: margin 250ms ease-in-out;
+
+				&:hover {
+					margin-top: -0.5em;
+				}
+			}
+
+			.likeContainer {
+				position: absolute;
+				.likeIcon {
+					width: 2.5em;
+				}
+			}
 			
 			.actionsContainer {
-				margin-left: 1em;
+				position: absolute;
+				margin-left: 4em;
+
+				.saveIcon, .cancelIcon {
+					width: 3em;
+				}
+
+				.editIcon {
+					width: 2.5em;
+				}
 			}
 		}
 	}

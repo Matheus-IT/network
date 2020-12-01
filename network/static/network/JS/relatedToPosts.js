@@ -40,9 +40,8 @@ function generatePosts(currentPagePostsData) {
 			</h3>
 			<div class="contentContainer">
 				<p>${postData.content}</p>
+				<p class="timestamp">${postData.timestamp}</p>
 			</div>
-			<em class="timestamp">${postData.timestamp}</em>
-			<br>
 			<div class="icons">
 				<div class="likeContainer">
 				</div>
@@ -214,7 +213,7 @@ function handleSaveNewPostContent(postData) {
 
 		post.querySelector('.contentContainer').innerHTML = `<p>${newContent}</p>`;
 
-		post.querySelector('.timestamp').innerHTML = data.timestamp;
+		post.querySelector('.contentContainer').innerHTML += `<p class="timestamp">${data.timestamp}</p>`;
 
 		const editIcon = post.querySelector(`#editIcon${postData.id}`);
 		editIcon.style.display = 'block';
@@ -228,8 +227,10 @@ function handleCancelEditPost(postData, editIcon) {
 	const post = document.querySelector(`#post${postData.id}`);
 	const contentContainer = post.querySelector('.contentContainer');
 	const postContent = contentContainer.querySelector(`#editArea${postData.id}`).innerHTML;
+	const postTimestamp = `<p class="timestamp">${postData.timestamp}</p>`;
 	
 	contentContainer.innerHTML = `<p>${postContent}</p>`;
+	contentContainer.innerHTML += postTimestamp;
 
 	editIcon.style.display = 'block';
 	post.querySelector('.actionsContainer').innerHTML = '';
